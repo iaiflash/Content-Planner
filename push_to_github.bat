@@ -12,7 +12,7 @@ git config user.email "iaiflash0.0@gmail.com"
 echo.
 echo [2/4] Menambahkan files ke staging...
 git add .
-git commit -m "feat: Rasio 3 Pilar popup, Brand Vault, auto aspect ratio, notification center, Firebase sync, and cloud APK build" >nul 2>&1
+git commit -m "fix(ci): fix gradle-version 8.2 for APK build and configure GitHub Pages" >nul 2>&1
 
 echo.
 echo [3/4] Mengatur branch ke main...
