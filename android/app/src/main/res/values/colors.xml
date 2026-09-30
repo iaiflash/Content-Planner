@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="obsidian">#18181B</color>
+    <color name="obsidian_dark">#0F172A</color>
+    <color name="canvas_bg">#F7F4EF</color>
+    <color name="gold">#FFE59A</color>
+    <color name="coral">#FF5B79</color>
+    <color name="white">#FFFFFF</color>
+</resources>

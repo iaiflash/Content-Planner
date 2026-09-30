@@ -1,0 +1,19 @@
+{
+  "name": "craftai-studio",
+  "version": "2.0.0",
+  "description": "Production Pipeline & Content OS for AI Video Creators & Developers",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "content-planner",
+    "ai-production",
+    "video-editor",
+    "capcut",
+    "teleprompter"
+  ],
+  "author": "iaiflash (iaiflash0.0@gmail.com)",
+  "license": "MIT"
+}

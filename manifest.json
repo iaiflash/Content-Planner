@@ -1,0 +1,46 @@
+{
+  "name": "CraftAI Studio — Content OS",
+  "short_name": "CraftAI",
+  "description": "Production Pipeline & Content OS for AI Video Creators & Developers",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f7f4ef",
+  "theme_color": "#18181b",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Naskah Script",
+      "url": "./index.html#script",
+      "description": "Buka tab penulisan naskah video"
+    },
+    {
+      "name": "Rekaman Audio",
+      "url": "./index.html#rekaman",
+      "description": "Buka teleprompter & audio vault"
+    },
+    {
+      "name": "Review Video",
+      "url": "./index.html#review",
+      "description": "Buka video player & checklist QC"
+    }
+  ]
+}

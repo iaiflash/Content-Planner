@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="sparkGlow" cx="60%" cy="30%" r="50%">
+      <stop offset="0%" stop-color="#fff5cc" stop-opacity="1"/>
+      <stop offset="40%" stop-color="#ffe59a" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#ffb5c1" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#27272a"/>
+      <stop offset="100%" stop-color="#18181b"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff2a3"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Squircle Base -->
+  <rect x="24" y="24" width="464" height="464" rx="120" ry="120" fill="url(#bgGrad)" stroke="#3f3f46" stroke-width="4"/>
+
+  <!-- Background Soft Radial Light -->
+  <circle cx="340" cy="170" r="160" fill="url(#sparkGlow)" opacity="0.35"/>
+
+  <!-- Cute Stylized Mascot Outline -->
+  <g filter="url(#glow)">
+    <!-- Ears -->
+    <path d="M 230 220 L 250 170 L 280 205" fill="none" stroke="url(#goldGrad)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 340 205 L 370 170 L 390 220" fill="none" stroke="url(#goldGrad)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Head / Body Contour -->
+    <path d="M 230 220 C 200 250 200 320 250 350 C 280 370 340 370 370 350 C 420 320 420 250 390 220 C 370 200 250 200 230 220 Z" 
+          fill="none" stroke="url(#goldGrad)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Cute Eyes -->
+    <path d="M 265 265 Q 275 255 285 265" fill="none" stroke="url(#goldGrad)" stroke-width="14" stroke-linecap="round"/>
+    <path d="M 335 265 Q 345 255 355 265" fill="none" stroke="url(#goldGrad)" stroke-width="14" stroke-linecap="round"/>
+
+    <!-- Smile -->
+    <path d="M 295 295 Q 310 315 325 295" fill="none" stroke="url(#goldGrad)" stroke-width="12" stroke-linecap="round"/>
+
+    <!-- Cute Front Paws -->
+    <path d="M 270 345 L 260 395" fill="none" stroke="url(#goldGrad)" stroke-width="18" stroke-linecap="round"/>
+    <path d="M 350 345 L 360 395" fill="none" stroke="url(#goldGrad)" stroke-width="18" stroke-linecap="round"/>
+
+    <!-- Adjacent Creative Loop ("C" for Craft) -->
+    <path d="M 220 230 C 140 210 110 300 130 350 C 150 400 230 400 240 350" 
+          fill="none" stroke="url(#goldGrad)" stroke-width="18" stroke-linecap="round"/>
+
+    <!-- Golden 4-point Sparkle Star -->
+    <path d="M 350 115 Q 350 145 375 145 Q 350 145 350 175 Q 350 145 325 145 Q 350 145 350 115 Z" 
+          fill="#ffe59a" stroke="#fff5cc" stroke-width="4"/>
+  </g>
+</svg>

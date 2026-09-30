@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.CraftAIStudio" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/obsidian</item>
+        <item name="colorPrimaryVariant">@color/obsidian_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:statusBarColor">@color/obsidian</item>
+        <item name="android:windowBackground">@color/canvas_bg</item>
+    </style>
+</resources>

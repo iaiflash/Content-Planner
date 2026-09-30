@@ -59,13 +59,31 @@ Aplikasi ini dilengkapi jembatan cloud **100% Gratis & Tanpa Server Eksternal** 
 
 ---
 
-## 🚀 Menjalankan Aplikasi
+## 🚀 Menjalankan & Memasang Aplikasi
 
-Aplikasi ini dibuat murni menggunakan standard web modern (HTML5, Vanilla CSS3, & Modern Vanilla JS).
-Cukup buka file `index.html` langsung di browser Chrome / Edge, atau jalankan dengan ekstensi Live Server.
+### 1. Web Langsung (Offline / Browser)
+Cukup buka file `index.html` langsung di browser Chrome / Edge di laptop atau HP. Didukung penyimpanan offline tak terbatas melalui **IndexedDB**.
+
+### 2. Local Database & REST Server
+Jalankan server REST API mandiri dengan Node.js:
+```bash
+npm start
+# Server aktif di http://localhost:3000
+```
+
+### 3. Live Hosting (GitHub Pages)
+Otomatis ter-deploy ke GitHub Pages saat melakukan push ke repository `main`:
+👉 **https://iaiflash.github.io/Content-Planner/**
+
+### 4. Pemasangan Aplikasi di HP Android (APK & PWA)
+- **Metode PWA (1-Tap):** Buka link web di Chrome Android -> Pilih **"Install Aplikasi"** / **"Tambahkan ke Layar Utama"**.
+- **Metode Native APK:** Jalankan `build_apk.bat` atau buka folder `android/` di Android Studio, lalu klik **Build APK**.
+
+*Dokumentasi lengkap langkah demi langkah tersedia di: [`PANDUAN_HOSTING_DATABASE_DAN_APK.md`](./PANDUAN_HOSTING_DATABASE_DAN_APK.md)*
 
 ---
 
 ## 👤 Identitas Pengembang
 - **GitHub:** [@iaiflash](https://github.com/iaiflash)
 - **Email:** `iaiflash0.0@gmail.com`
+

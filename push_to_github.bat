@@ -15,7 +15,7 @@ git add .
 
 echo.
 echo [3/5] Melakukan commit...
-git commit -m "feat: CraftAI Studio Content OS with Google Sheets & Drive Cloud Integration"
+git commit -m "feat: Rasio 3 Pilar popup, Brand Vault, auto aspect ratio, notification center, Firebase sync, and cloud APK build"
 
 echo.
 echo [4/5] Mengatur branch ke main...

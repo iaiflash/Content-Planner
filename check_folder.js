@@ -1,16 +1,15 @@
 const fs = require('fs');
-const path = require('path');
 
-const targetDir = 'C:\\Users\\Asep\\OneDrive\\Gambar\\App Craft\\Folder Baru';
-
-console.log('Checking:', targetDir);
-if (fs.existsSync(targetDir)) {
-  const files = fs.readdirSync(targetDir);
-  console.log('Found ' + files.length + ' items in Folder Baru:');
-  files.forEach(f => {
-    const stat = fs.statSync(path.join(targetDir, f));
-    console.log(f + (stat.isDirectory() ? ' [DIR]' : ' (' + Math.round(stat.size / 1024) + ' KB)'));
-  });
-} else {
-  console.log('Directory does not exist:', targetDir);
+try {
+  const content = fs.readFileSync('index.html', 'utf8');
+  const scriptMatch = content.match(/<script>([\s\S]*?)<\/script>/);
+  if (scriptMatch) {
+    new Function(scriptMatch[1]);
+    console.log('SUCCESS: index.html JavaScript syntax is 100% VALID and error-free!');
+  } else {
+    console.log('ERROR: <script> tag not found');
+  }
+} catch (err) {
+  console.error('SYNTAX ERROR DETECTED:', err.message);
+  console.error(err.stack);
 }

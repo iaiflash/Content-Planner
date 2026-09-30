@@ -1,0 +1,17 @@
+{
+  "name": "CraftAI Studio — Content OS",
+  "short_name": "CraftAI",
+  "description": "Production Pipeline & Content OS for AI Video Creators & Developers",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f7f4ef",
+  "theme_color": "#18181b",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -5,10 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>CraftAI Studio — Content OS & Production Pipeline</title>
   
-  <!-- Google Fonts: Outfit, Plus Jakarta Sans, JetBrains Mono -->
+  <!-- Progressive Web App (PWA) & Mobile APK Setup -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#18181b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CraftAI Studio">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
+
+  <!-- Google Fonts: Plus Jakarta Sans, Outfit, Inter, JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
 
   <style>
     /* ==========================================================================
@@ -71,9 +81,9 @@
       --shadow-card: 0 4px 20px rgba(24, 24, 27, 0.035), 0 1px 3px rgba(24, 24, 27, 0.02);
       --shadow-float: 0 12px 36px rgba(24, 24, 27, 0.16);
 
-      --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
+      --font-display: 'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
     }
 
     * {
@@ -93,9 +103,92 @@
       justify-content: flex-start;
       padding: 16px;
       font-size: 13.5px;
-      line-height: 1.5;
+      line-height: 1.6;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      letter-spacing: -0.012em;
       padding-bottom: 24px;
+    }
+
+    h1, h2, h3, h4, .card-title, .modal-box strong {
+      letter-spacing: -0.025em;
+    }
+
+    .btn-micro {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-pill);
+      padding: 2.5px 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      line-height: 1.25;
+      user-select: none;
+    }
+    .btn-micro:hover {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+    .btn-micro:active {
+      transform: translateY(0);
+    }
+
+    .research-link-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--bg-window);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-pill);
+      padding: 4px 10px 4px 6px;
+      transition: all 0.18s ease;
+    }
+    .research-link-card:hover {
+      border-color: var(--sky);
+      box-shadow: 0 2px 8px rgba(14, 165, 233, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .vault-filter-btn {
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .vault-filter-btn.active, .vault-filter-btn:hover {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .vault-card {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+      transition: all 0.18s ease;
+    }
+    .vault-card:hover {
+      background: #ffffff;
+      border-color: var(--border-card);
+      box-shadow: 0 4px 14px rgba(24, 24, 27, 0.05);
+      transform: translateY(-1.5px);
     }
 
     /* Scrollbars */
@@ -1107,7 +1200,7 @@
       }
       body {
         padding: 0;
-        padding-bottom: 84px; /* Space for mobile floating bottom bar */
+        padding-bottom: 148px !important; /* Space for both mobile bottom nav + floating quickbar */
       }
       .step-label-full { display: none !important; }
       .step-label-short { display: inline !important; }
@@ -1392,6 +1485,226 @@
         border-radius: var(--radius-md) !important;
         box-sizing: border-box !important;
       }
+
+      /* Mobile Input Touch & Zoom Prevention */
+      input, select, textarea, .form-input, .form-select, .script-textarea {
+        font-size: 16px !important; /* Prevents auto-zoom viewport jump on Android/iOS */
+      }
+
+      /* Responsive Teleprompter on Mobile */
+      .teleprompter-content {
+        max-height: 175px !important;
+      }
+
+      /* Mobile Floating Quickbar (Positioned above Mobile Nav Capsule - Zero Overlap!) */
+      .floating-quickbar {
+        bottom: 70px !important;
+        max-width: calc(100vw - 20px) !important;
+        padding: 4px 8px !important;
+        gap: 6px !important;
+        z-index: 1000 !important;
+      }
+      .floating-quickbar-btn {
+        padding: 6px 10px !important;
+        font-size: 11.5px !important;
+      }
+      .floating-quickbar-stage-badge {
+        font-size: 10px !important;
+        max-width: 90px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+    }
+
+    /* ==========================================================================
+       PRODUCTION EDITING ASSISTANT & FLOATING QUICK-ACTION BAR STYLES
+       ========================================================================== */
+    .floating-quickbar {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(24, 24, 27, 0.94);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--radius-pill);
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.32);
+      z-index: 1000;
+      max-width: 94vw;
+      transition: all 0.3s ease;
+    }
+    .floating-quickbar-btn {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-pill);
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font-body);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .floating-quickbar-btn:hover {
+      background: rgba(255, 255, 255, 0.22);
+      transform: translateY(-1px);
+    }
+    .floating-quickbar-btn.hero {
+      background: #ffe59a;
+      color: #18181b;
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(255, 229, 154, 0.38);
+    }
+    .floating-quickbar-btn.hero:hover {
+      background: #ffdb70;
+    }
+    .floating-quickbar-stage-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.65);
+      padding: 0 4px;
+      white-space: nowrap;
+    }
+
+    /* Teleprompter Card in Audio Pane */
+    .teleprompter-card {
+      background: var(--bg-window);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: var(--shadow-card);
+    }
+    .teleprompter-content {
+      max-height: 260px;
+      overflow-y: auto;
+      padding: 14px 16px;
+      background: var(--bg-subtle);
+      border-radius: var(--radius-sm);
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: var(--text-dark);
+      border-left: 3.5px solid var(--kawaii-sky);
+      font-family: var(--font-body);
+      white-space: pre-wrap;
+    }
+    .teleprompter-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Video Timestamped Edit Revisions */
+    .revision-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 12px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+    .revision-item.done {
+      opacity: 0.6;
+      background: #f4efe6;
+    }
+    .revision-item.done .revision-note-text {
+      text-decoration: line-through;
+    }
+    .revision-timestamp-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 3px 8px;
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      font-weight: 700;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .revision-timestamp-btn:hover {
+      background: #fca5a5;
+    }
+    .revision-note-text {
+      flex: 1;
+      font-size: 12.5px;
+      color: var(--text-body);
+      word-break: break-word;
+    }
+
+    /* Editor Timeline Cues in Script */
+    .edit-cue-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .edit-cue-box {
+      background: #fbf9f5;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+    }
+    .edit-cue-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 3px;
+    }
+    .edit-cue-input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 12px;
+      font-family: var(--font-body);
+      color: var(--text-dark);
+      outline: none;
+    }
+
+    /* Star Best Take Badge */
+    .take-best-badge {
+      background: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+      font-weight: 700;
+      font-size: 10.5px;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-kawaii-sky {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+    }
+    .btn-kawaii-sky:hover {
+      background: #bae6fd;
     }
   </style>
 </head>
@@ -1459,8 +1772,17 @@
         </div>
       </div>
 
-      <!-- Header Action: Buat Konten Baru -->
-      <div class="app-topbar-action">
+      <!-- Header Action: Cloud Sync, Notifikasi & Buat Konten Baru -->
+      <div class="app-topbar-action" style="display:flex; align-items:center; gap:8px;">
+        <button class="btn btn-kawaii-sky" onclick="openCloudSyncModal()" title="Koneksi Database Cloud (Google Sheets, Drive & Firebase)">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
+          <span class="btn-text-desktop">Database</span>
+        </button>
+        <button class="btn btn-white" id="topbarNotifBtn" onclick="openNotificationModal()" title="Pusat Notifikasi & Pengingat Jadwal" style="position:relative; padding:6px 11px;">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          <span class="btn-text-desktop">Notif</span>
+          <span id="notifBadgeDot" style="display:none; position:absolute; top:2px; right:2px; width:8px; height:8px; background:var(--coral); border-radius:50%; border:2px solid #ffffff;"></span>
+        </button>
         <button class="btn btn-primary" onclick="openNewProjectModal()">
           <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           Konten Baru
@@ -1496,7 +1818,7 @@
     <nav class="menu-tabs-bar">
       <button class="menu-tab-btn active" data-tab="home" onclick="openMenu('home')">
         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
-        <span>Home / Rekap</span>
+        <span>Home</span>
       </button>
 
       <button class="menu-tab-btn" data-tab="riset" onclick="openMenu('riset')">
@@ -1536,7 +1858,7 @@
     <div class="app-body">
 
       <!-- ====================================================================
-           MENU 0: HOME / REKAP (Summary Bento + Master Table with Delete Project)
+           MENU 0: HOME (Summary Bento + Master Table with Delete Project)
            ==================================================================== -->
       <section class="menu-pane active" id="pane-home">
         
@@ -1548,10 +1870,16 @@
             <span class="badge badge-primary">Batch 1 Fondasi</span>
           </div>
 
-          <div class="card">
-            <span style="font-size:11.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Rasio 3 Pilar</span>
-            <div style="font-family:var(--font-display); font-size:26px; font-weight:800; color:var(--text-dark); margin:6px 0;">40 / 40 / 20</div>
-            <span class="badge badge-mint">✓ Seimbang & Sehat</span>
+          <div class="card" onclick="openPillarRatioModal()" style="cursor:pointer; transition:all 0.18s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" title="Klik untuk penjelasan & panduan Rasio 3 Pilar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Rasio 3 Pilar</span>
+              <span style="font-size:11px; color:var(--sky); font-weight:700; display:inline-flex; align-items:center; gap:3px;">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                Info
+              </span>
+            </div>
+            <div style="font-family:var(--font-display); font-size:26px; font-weight:800; color:var(--text-dark); margin:6px 0;" id="homePillarRatio">40 / 40 / 20</div>
+            <span class="badge badge-mint" id="homePillarStatus">✓ Seimbang & Sehat • Klik Detail</span>
           </div>
 
           <div class="card">
@@ -1562,8 +1890,8 @@
 
           <div class="card">
             <span style="font-size:11.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Kesiapan Upload</span>
-            <div style="font-family:var(--font-display); font-size:26px; font-weight:800; color:var(--text-dark); margin:6px 0;">2 / 3 Siap</div>
-            <span class="badge badge-amber">Menuju Rilis</span>
+            <div style="font-family:var(--font-display); font-size:26px; font-weight:800; color:var(--text-dark); margin:6px 0;" id="homeUploadReadiness">0 / 0 Siap</div>
+            <span class="badge badge-amber" id="homeUploadBadge">Menuju Rilis</span>
           </div>
         </div>
 
@@ -1730,6 +2058,41 @@
           </div>
         </div>
 
+        <!-- 4. Global Brand Kit & Asset Vault Favorit (Lintas Video / Reusable) -->
+        <div class="card" id="brandVaultSection" style="margin-top:20px; border:1.5px solid var(--border-subtle); background:var(--bg-window);">
+          <div class="card-header">
+            <div>
+              <div class="card-title" style="display:flex; align-items:center; gap:8px;">
+                <div style="background:var(--kawaii-yellow); width:28px; height:28px; border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center;">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--text-dark)" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </div>
+                Brand Kit & Asset Vault Favorit (Lintas Video)
+              </div>
+              <p style="font-size:12px; color:var(--text-muted); margin-top:2px;">
+                Simpan opening hook, ending / CTA, transisi cutscene, dan suara SFX favorit yang akan sering dipakai di berbagai video.
+              </p>
+            </div>
+            <button class="btn btn-primary" onclick="openAddVaultModal()">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Tambah Asset Vault
+            </button>
+          </div>
+
+          <!-- Category Filter Tabs for Vault -->
+          <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+            <button class="vault-filter-btn active" id="vaultFilterBtn_all" onclick="filterVault('all')">Semua Asset</button>
+            <button class="vault-filter-btn" id="vaultFilterBtn_openings" onclick="filterVault('openings')">🎬 Opening & Intro</button>
+            <button class="vault-filter-btn" id="vaultFilterBtn_endings" onclick="filterVault('endings')">🎯 Ending & CTA</button>
+            <button class="vault-filter-btn" id="vaultFilterBtn_cutscenes" onclick="filterVault('cutscenes')">✂️ Cutscene & Meme</button>
+            <button class="vault-filter-btn" id="vaultFilterBtn_sfx" onclick="filterVault('sfx')">🔊 Suara / SFX Favorit</button>
+          </div>
+
+          <!-- Vault Items Grid -->
+          <div id="vaultCardsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:12px;">
+            <!-- Dynamically populated by renderBrandVault() -->
+          </div>
+        </div>
+
       </section>
 
       <!-- ====================================================================
@@ -1758,6 +2121,10 @@
           </div>
 
           <div class="script-tools-row" style="display:flex; gap:8px;">
+            <button class="btn btn-primary" onclick="copyCapCutEditSheet()" style="background:#10b981; border-color:#10b981;" title="Salin contekan timeline edit untuk CapCut / Premiere">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Salin Panduan Edit (CapCut / Premiere)</span>
+            </button>
             <button class="btn btn-coral" onclick="exportMarkdownScript()">
               <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
               Export .md
@@ -1872,6 +2239,29 @@
            MENU 3: REKAMAN SUARA (Audio Vault Table CRUD + Play & Edit Path)
            ==================================================================== -->
       <section class="menu-pane" id="pane-rekaman">
+
+        <!-- Teleprompter Mini (Bisa Baca Naskah Langsung Sambil Rekam Audio) -->
+        <div class="teleprompter-card" style="margin-bottom:16px;">
+          <div class="teleprompter-controls">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" style="color:var(--sky);"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              <strong style="font-size:14px; color:var(--text-dark);">Teleprompter Naskah Studio</strong>
+              <span class="badge badge-sky" id="teleprompterWordCount">0 Kata</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <button class="btn btn-white" style="font-size:11px; padding:3px 8px;" onclick="changeTeleprompterFontSize(-1)" title="Perkecil Font">A-</button>
+              <button class="btn btn-white" style="font-size:11px; padding:3px 8px;" onclick="changeTeleprompterFontSize(1)" title="Perbesar Font">A+</button>
+              <button class="btn btn-white" style="font-size:11px; padding:4px 10px;" onclick="copyTeleprompterText()">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                Salin Semua Teks
+              </button>
+            </div>
+          </div>
+          <div class="teleprompter-content" id="teleprompterTextBody">
+            Memuat naskah narasi proyek...
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-header">
             <div>
@@ -2000,6 +2390,23 @@
             <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border-card); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
               <span style="font-size:12px; font-weight:700; color:var(--text-muted);">Status Kelayakan Upload:</span>
               <div style="display:flex; gap:6px; flex-wrap:wrap;" id="uploadStatusBadges"></div>
+            </div>
+
+            <!-- Video Editing Revision Notes Box (Membantu Catat Timecode Revisi Saat Nonton) -->
+            <div style="margin-top:16px; border-top:1px solid var(--border-card); padding-top:14px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <strong style="font-size:13px; color:var(--text-dark);">Catatan Revisi Editing Video:</strong>
+                  <span class="badge badge-coral" id="reviewRevisionCount">0 Revisi</span>
+                </div>
+                <button class="btn btn-coral" style="font-size:11.5px; padding:5px 12px;" onclick="openAddRevisionModal()">
+                  <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  <span>Catat Revisi Detik Ini</span>
+                </button>
+              </div>
+              <div id="videoRevisionsList">
+                <!-- Dynamically rendered -->
+              </div>
             </div>
           </div>
 
@@ -2137,7 +2544,10 @@
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; position:relative; z-index:2;">
             <div>
               <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                <span class="badge" style="background:var(--kawaii-yellow); color:#18181b; font-weight:800;">✨ TAHAP 6: FINAL OUTPUT</span>
+                <span class="badge" style="background:var(--kawaii-yellow); color:#18181b; font-weight:800; display:inline-flex; align-items:center; gap:5px;">
+                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  TAHAP 6: FINAL OUTPUT
+                </span>
                 <span class="badge" style="background:rgba(255,255,255,0.15); color:#ffffff;" id="outputProjectPillarBadge">Pilar Konten</span>
               </div>
               <h2 style="font-family:var(--font-display); font-size:20px; font-weight:800; color:#ffffff; margin-bottom:4px;" id="outputProjectTitle">
@@ -2151,7 +2561,7 @@
               <button class="btn btn-coral" onclick="downloadAllOutputsPackage()">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 Download Semua (Video + Audio)
-                <span class="btn-circle-badge">↓</span>
+                <span class="btn-circle-badge"><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg></span>
               </button>
             </div>
           </div>
@@ -2198,7 +2608,7 @@
               <button class="btn btn-primary" style="flex:1; justify-content:center;" onclick="downloadProjectVideo()">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 Download Video Master (.mp4)
-                <span class="btn-circle-badge">↓</span>
+                <span class="btn-circle-badge"><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg></span>
               </button>
               <button class="btn btn-white" title="Ganti File Video" onclick="openModal('modalChangeVideo')">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
@@ -2260,7 +2670,7 @@
               <button class="btn btn-primary" style="flex:1; justify-content:center;" onclick="downloadProjectAudio()">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 Download Audio Master (.wav)
-                <span class="btn-circle-badge">↓</span>
+                <span class="btn-circle-badge"><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg></span>
               </button>
               <button class="btn btn-white" title="Ke Vault Audio" onclick="openMenu('rekaman')">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg>
@@ -2329,6 +2739,31 @@
   </main>
 
   <!-- ========================================================================
+       FLOATING QUICK-ACTION BAR CAPSULE (Satu Jempol Responsif di HP & Desktop)
+       ======================================================================== -->
+  <aside class="floating-quickbar" id="floatingQuickBar">
+    <button class="floating-quickbar-btn" onclick="goToPrevStage()" title="Kembali ke tahap sebelumnya">
+      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      <span class="desktop-only-view">Prev</span>
+    </button>
+
+    <div class="floating-quickbar-stage-badge" id="floatingStageIndicator">
+      Tahap 1: Riset
+    </div>
+
+    <!-- Hero Context Button (Berubah dinamis sesuai tab/tahap aktif) -->
+    <button class="floating-quickbar-btn hero" id="floatingContextBtn" onclick="triggerFloatingContextAction()">
+      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      <span id="floatingContextLabel">+ Aksi Cepat</span>
+    </button>
+
+    <button class="floating-quickbar-btn" onclick="goToNextStage()" title="Lanjut ke tahap berikutnya">
+      <span class="desktop-only-view">Next</span>
+      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+  </aside>
+
+  <!-- ========================================================================
        MOBILE APK FLOATING BOTTOM NAVIGATION CAPSULE
        ======================================================================== -->
   <nav class="mobile-bottom-nav">
@@ -2394,6 +2829,94 @@
     </div>
   </div>
 
+  <!-- Modal: Edukasi & Strategi Rasio 3 Pilar (40 / 40 / 20) -->
+  <div class="modal-backdrop" id="modalPillarRatio">
+    <div class="modal-box" style="max-width: 620px; max-height: 90vh; overflow-y: auto;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="background:var(--kawaii-yellow); width:40px; height:40px; border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--text-dark)" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          </div>
+          <div>
+            <strong style="font-size:17px; color:var(--text-dark); display:block;">Kenapa Harus Rasio 3 Pilar (40 / 40 / 20)?</strong>
+            <span style="font-size:12px; color:var(--text-muted);">Formula distribusi konten AI teruji agar channel punya authority, viralitas & cuan</span>
+          </div>
+        </div>
+        <button style="border:none; background:transparent; color:var(--text-muted); cursor:pointer; padding:4px;" onclick="closeModal('modalPillarRatio')">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:18px;">
+        <!-- Pilar 1 -->
+        <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:var(--radius-md); padding:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <strong style="color:#15803d; font-size:14px; display:inline-flex; align-items:center; gap:6px;">
+              <span style="background:#15803d; color:#fff; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px;">1</span>
+              Pilar Fondasi & Sejarah AI (Porsi 40%)
+            </strong>
+            <span class="badge badge-mint" style="font-size:11px;">Evergreen & Authority</span>
+          </div>
+          <p style="font-size:12.5px; color:#166534; line-height:1.55; margin-bottom:6px;">
+            <strong>Fungsi:</strong> Menjelaskan akar sains, sejarah penemu (Turing, Hinton, LeCun), dan masalah mendasar komputer. Konten ini dicari orang sepanjang tahun (long-tail traffic) dan membangun reputasi kamu sebagai edukator AI yang punya kredibilitas tinggi, bukan sekadar ikut tren musiman.
+          </p>
+          <div style="font-size:11.5px; color:#14532d; font-style:italic;">
+            Contoh: "Kenapa AI Butuh Triliunan Parameter?", "Garis Waktu Kelahiran AI dari Tabung Hampa ke LLM"
+          </div>
+        </div>
+
+        <!-- Pilar 2 -->
+        <div style="background:#faf5ff; border:1px solid #e9d5ff; border-radius:var(--radius-md); padding:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <strong style="color:#6b21a8; font-size:14px; display:inline-flex; align-items:center; gap:6px;">
+              <span style="background:#6b21a8; color:#fff; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px;">2</span>
+              Pilar Taksonomi & Konsep AI (Porsi 40%)
+            </strong>
+            <span class="badge badge-violet" style="font-size:11px;">Edukasi & Nilai Tinggi</span>
+          </div>
+          <p style="font-size:12.5px; color:#581c87; line-height:1.55; margin-bottom:6px;">
+            <strong>Fungsi:</strong> Membedah cara kerja teknologi secara visual dan analogis (Transformer, Self-Attention, RAG, Fine-tuning vs Pre-training, Agentic loop). Membuat penonton awam & programmer merasa cerdas setelah menonton video kamu.
+          </p>
+          <div style="font-size:11.5px; color:#3b0764; font-style:italic;">
+            Contoh: "Perbedaan Machine Learning vs Deep Learning", "Cara Kerja RAG dalam 5 Menit"
+          </div>
+        </div>
+
+        <!-- Pilar 3 -->
+        <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:var(--radius-md); padding:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <strong style="color:#b45309; font-size:14px; display:inline-flex; align-items:center; gap:6px;">
+              <span style="background:#b45309; color:#fff; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px;">3</span>
+              Pilar Update & Showcase APK Karya Sendiri (Porsi 20%)
+            </strong>
+            <span class="badge badge-amber" style="font-size:11px;">Portofolio & Mesin Cuan</span>
+          </div>
+          <p style="font-size:12.5px; color:#92400e; line-height:1.55; margin-bottom:6px;">
+            <strong>Fungsi:</strong> Menunjukkan aplikasi AI nyata yang kamu buat sendiri (dari folder ide APK) serta ulasan model AI terkini. Ini adalah pembuktian nyata kemampuan praktis kamu untuk membuka peluang sponsor, penjualan template/source code, freelance dev, atau subscribers premium!
+          </p>
+          <div style="font-size:11.5px; color:#78350f; font-style:italic;">
+            Contoh: "Gue Bikin Aplikasi AI Ini Dalam 3 Hari", "Showcase APK AI Asisten Dokter / Content Studio"
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Balance Card -->
+      <div style="background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:12px 16px; margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <strong style="font-size:12.5px; color:var(--text-dark);">Keseimbangan Konten Kamu Saat Ini:</strong>
+          <span id="pillarModalTotal" style="font-size:12px; font-weight:700; color:var(--text-dark);">0 Proyek</span>
+        </div>
+        <div id="pillarModalBreakdown" style="display:flex; flex-direction:column; gap:8px; font-size:12px;">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn btn-primary" onclick="closeModal('modalPillarRatio')">Paham & Terapkan Strategi</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 2. Modal: Tambah Sumber Link -->
   <div class="modal-backdrop" id="modalAddLink">
     <div class="modal-box">
@@ -2415,9 +2938,45 @@
         <label>Kategori</label>
         <input type="text" id="inputLinkType" class="form-input" placeholder="arXiv / Leaderboard / Blog Resmi" value="arXiv">
       </div>
+      <div class="form-group">
+        <label>Keterangan / Intisari Tautan (Opsional)</label>
+        <input type="text" id="inputLinkDesc" class="form-input" placeholder="Contoh: Bukti data benchmark kecepatan model & arsitektur baru">
+      </div>
       <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
         <button class="btn btn-white" onclick="closeModal('modalAddLink')">Batal</button>
         <button class="btn btn-primary" onclick="submitAddResearchLink()">Simpan Link</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Info Detail Tautan Riset -->
+  <div class="modal-backdrop" id="modalLinkInfo">
+    <div class="modal-box" style="max-width: 480px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <strong style="font-size:16px; color:var(--text-dark);" id="modalLinkInfoTitle">Detail Tautan Riset</strong>
+        <button style="border:none; background:transparent; color:var(--text-muted); cursor:pointer;" onclick="closeModal('modalLinkInfo')">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:10px; font-size:13px;">
+        <div>
+          <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">URL Target:</span>
+          <div style="word-break:break-all; margin-top:2px;">
+            <a id="modalLinkInfoUrl" href="#" target="_blank" style="color:var(--sky); font-weight:600; text-decoration:none;">-</a>
+          </div>
+        </div>
+        <div>
+          <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Kategori:</span>
+          <div id="modalLinkInfoType" style="margin-top:2px; font-weight:600; color:var(--text-dark);">-</div>
+        </div>
+        <div>
+          <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Keterangan / Intisari:</span>
+          <div id="modalLinkInfoDesc" style="margin-top:2px; line-height:1.55; color:var(--text-body); background:var(--bg-subtle); padding:10px 12px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">-</div>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+        <a id="modalLinkInfoOpenBtn" href="#" target="_blank" class="btn btn-white" style="font-size:12px; text-decoration:none;">Buka Link ↗</a>
+        <button class="btn btn-primary" onclick="closeModal('modalLinkInfo')">Tutup</button>
       </div>
     </div>
   </div>
@@ -2487,7 +3046,10 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Rasio Visual</label>
+          <label style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Rasio Visual</span>
+            <span id="detectedRatioBadge" class="badge badge-mint" style="font-size:10px; padding:1px 6px; display:none;">✨ Terbaca Otomatis</span>
+          </label>
           <select id="inputMediaFormat" class="form-select">
             <option value="16:9">16:9 (Landscape)</option>
             <option value="9:16">9:16 (Vertikal)</option>
@@ -2502,6 +3064,64 @@
       <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
         <button class="btn btn-white" onclick="closeModal('modalAddMedia')">Batal</button>
         <button class="btn btn-primary" onclick="submitAddMedia()">Simpan Media</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Tambah Asset ke Brand Kit Vault -->
+  <div class="modal-backdrop" id="modalAddVault">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong style="font-size:16px; color:var(--text-dark);">Tambah Asset ke Brand Kit Vault</strong>
+        <button style="border:none; background:transparent; color:var(--text-muted); cursor:pointer;" onclick="closeModal('modalAddVault')">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="form-group">
+        <label>Kategori Asset</label>
+        <select id="inputVaultCategory" class="form-select">
+          <option value="openings">🎬 Opening & Intro Hook</option>
+          <option value="endings">🎯 Ending, Outro & CTA</option>
+          <option value="cutscenes">✂️ Cutscene, B-Roll & Meme</option>
+          <option value="sfx">🔊 Efek Suara / SFX Favorit</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Judul / Nama Asset</label>
+        <input type="text" id="inputVaultTitle" class="form-input" placeholder="Contoh: Hook Pembuka Standar AI / Whoosh Cinematic">
+      </div>
+      <div class="form-group">
+        <label>Konten / Kalimat / Nama File</label>
+        <textarea id="inputVaultContent" class="form-input" style="min-height:75px;" placeholder="Tuliskan teks narasi hook, nama file video intro, atau deskripsi efek..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Catatan Penggunaan / Durasi (Opsional)</label>
+        <input type="text" id="inputVaultNote" class="form-input" placeholder="Contoh: Gunakan di 3 detik pertama / Durasi 0.4s">
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
+        <button class="btn btn-white" onclick="closeModal('modalAddVault')">Batal</button>
+        <button class="btn btn-primary" onclick="submitAddVault()">Simpan ke Vault</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Pemilih Asset Vault untuk Naskah -->
+  <div class="modal-backdrop" id="modalVaultSelector">
+    <div class="modal-box" style="max-width: 520px; max-height: 85vh; overflow-y: auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div>
+          <strong style="font-size:16px; color:var(--text-dark);" id="modalVaultSelectorTitle">Pilih dari Brand Vault Favorit</strong>
+          <span style="font-size:11.5px; color:var(--text-muted); display:block;">Klik salah satu item untuk langsung memasukkannya ke naskah</span>
+        </div>
+        <button style="border:none; background:transparent; color:var(--text-muted); cursor:pointer;" onclick="closeModal('modalVaultSelector')">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div id="modalVaultSelectorItems" style="display:flex; flex-direction:column; gap:8px;">
+        <!-- Dynamically populated -->
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+        <button class="btn btn-white" onclick="closeModal('modalVaultSelector')">Tutup</button>
       </div>
     </div>
   </div>
@@ -2714,6 +3334,247 @@
     </div>
   </div>
 
+  <!-- 12. Modal: Catat Revisi Editing Video -->
+  <div class="modal-backdrop" id="modalAddRevision">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; border-radius:50%; background:var(--coral-light); display:flex; align-items:center; justify-content:center; color:var(--coral); flex-shrink:0;">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <div>
+            <strong style="font-size:16px; color:var(--text-dark);">Catat Revisi Editing Video</strong>
+            <div style="font-size:11.5px; color:var(--text-muted);">Tandai detik video & instruksi perbaikan untuk editor</div>
+          </div>
+        </div>
+        <button style="border:none; background:transparent; color:var(--text-muted); cursor:pointer;" onclick="closeModal('modalAddRevision')">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="form-group" style="margin-top:12px;">
+        <label>Timestamp / Detik Video</label>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="inputRevisionTimestamp" class="form-input" style="font-family:var(--font-mono); font-weight:700; max-width:130px;" placeholder="00:00">
+          <button class="btn btn-white" type="button" onclick="captureCurrentVideoTime()" style="font-size:12px;">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            Ambil Detik Ini
+          </button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Catatan Revisi / Instruksi Potong</label>
+        <textarea id="inputRevisionNote" class="form-input" style="min-height:85px;" placeholder="Contoh: B-roll terlambat muncul, potong dead air 0.5s, atau turunkan volume backsound..."></textarea>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
+        <button class="btn btn-white" onclick="closeModal('modalAddRevision')">Batal</button>
+        <button class="btn btn-primary" onclick="submitVideoRevision()">Simpan Catatan Revisi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 13. Modal: Panduan Timeline Edit (CapCut / Premiere) -->
+  <div class="modal-backdrop" id="modalExportCapCut">
+    <div class="modal-box" style="max-width:580px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; border-radius:50%; background:var(--mint-light); display:flex; align-items:center; justify-content:center; color:var(--mint); flex-shrink:0;">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </div>
+          <div>
+            <strong style="font-size:16px; color:var(--text-dark);">Panduan Edit CapCut / Premiere</strong>
+            <div style="font-size:11.5px; color:var(--text-muted);">Urutan narasi, footage terhubung, arahan visual & SFX siap sontek</div>
+          </div>
+        </div>
+        <button style="border:none; background:transparent; color:var(--text-muted); cursor:pointer;" onclick="closeModal('modalExportCapCut')">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div style="margin-top:14px;">
+        <textarea id="capcutEditSheetPreview" class="form-input" style="min-height:280px; font-family:var(--font-mono); font-size:12px; line-height:1.6;" readonly></textarea>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; flex-wrap:wrap; gap:8px;">
+        <span style="font-size:11px; color:var(--text-muted);" id="capcutWordStats">0 Segmen Naskah</span>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-white" onclick="closeModal('modalExportCapCut')">Tutup</button>
+          <button class="btn btn-primary" onclick="copyCapCutSheetToClipboard()" style="background:#10b981; border-color:#10b981;">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            Salin Semua ke Clipboard
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 14. Modal: Cloud Sync (Google Sheets & Google Drive iaiflash0.0@gmail.com + Firebase) -->
+  <div class="modal-backdrop" id="modalCloudSync">
+    <div class="modal-box" style="max-width:540px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:36px; height:36px; border-radius:50%; background:#e0f2fe; display:flex; align-items:center; justify-content:center; color:#0284c7;">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
+          </div>
+          <div>
+            <strong style="font-size:16px; color:var(--text-dark);">Cloud Sync Database & Media Vault</strong>
+            <div style="font-size:11.5px; color:var(--text-muted);">Akun: <strong>iaiflash0.0@gmail.com</strong> (GitHub: iaiflash)</div>
+          </div>
+        </div>
+        <button style="border:none; background:transparent; color:var(--text-muted); cursor:pointer;" onclick="closeModal('modalCloudSync')">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <!-- Cloud Database Tabs Switcher -->
+      <div style="display:flex; border-bottom:1.5px solid var(--border-subtle); margin:12px 0 14px 0; gap:6px;">
+        <button type="button" class="btn cloud-tab-btn active" id="tabBtnGoogle" onclick="switchCloudDbTab('google')" style="font-size:11.5px; border-bottom-left-radius:0; border-bottom-right-radius:0; background:var(--primary); color:#ffffff;">
+          Google Sheets & Drive
+        </button>
+        <button type="button" class="btn btn-white cloud-tab-btn" id="tabBtnFirebase" onclick="switchCloudDbTab('firebase')" style="font-size:11.5px; border-bottom-left-radius:0; border-bottom-right-radius:0;">
+          🔥 Firebase Realtime DB
+        </button>
+      </div>
+
+      <!-- Panel 1: Google Sheets & Drive (iaiflash0.0@gmail.com) -->
+      <div id="cloudPanelGoogle">
+        <div style="background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:12px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Status Google Cloud</span>
+            <span class="badge badge-mint" id="cloudSyncStatusBadge">Siap Terhubung</span>
+          </div>
+          <div style="font-size:12px; color:var(--text-body); line-height:1.5;">
+            • <strong>Google Sheets:</strong> Menyimpan 8 tabel database proyek, riset, naskah, audio, & packaging.<br>
+            • <strong>Google Drive:</strong> Menyimpan file footage, rekaman suara WAV, thumbnail, & video master di folder <code>CraftAI Studio Media Vault (iaiflash)</code>.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Google Apps Script Web App Endpoint URL</label>
+          <input type="url" id="inputCloudScriptUrl" class="form-input" placeholder="https://script.google.com/macros/s/.../exec">
+          <span style="font-size:11px; color:var(--text-dim); display:block; margin-top:3px;">
+            URL diperoleh setelah Deploy file <code>GoogleAppsScript_Bridge.gs</code> di script.google.com
+          </span>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+          <button class="btn btn-white" style="font-size:12px; flex:1;" onclick="copyAppsScriptCode()">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            Salin Kode Bridge .gs
+          </button>
+          <button class="btn btn-primary" style="font-size:12px; flex:1.2;" onclick="saveCloudEndpointAndSync()">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            Simpan & Sync Google
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel 2: Firebase Realtime Database -->
+      <div id="cloudPanelFirebase" style="display:none;">
+        <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:var(--radius-sm); padding:12px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <strong style="color:#c2410c; font-size:12px;">Firebase Cloud Sync</strong>
+            <span class="badge badge-amber" id="firebaseSyncStatusBadge">Siap Dihubungkan</span>
+          </div>
+          <div style="font-size:11.5px; color:#9a3412; line-height:1.45;">
+            Menyimpan data proyek secara langsung ke Firebase Cloud tanpa backend server tambahan.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Firebase Realtime Database URL</label>
+          <input type="url" id="inputFirebaseUrl" class="form-input" placeholder="https://projek-kamu-default-rtdb.firebaseio.com">
+          <span style="font-size:11px; color:var(--text-dim); display:block; margin-top:3px;">
+            Dapat dilihat di Firebase Console ➔ Realtime Database ➔ Data URL
+          </span>
+        </div>
+
+        <div class="form-group" style="margin-top:8px;">
+          <label>Firebase Auth Token / Database Secret (Opsional)</label>
+          <input type="password" id="inputFirebaseSecret" class="form-input" placeholder="Kosongkan jika Rules: read, write = true">
+        </div>
+
+        <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+          <button class="btn btn-white" style="font-size:12px; flex:1;" onclick="pullFromFirebase()">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Tarik dari Firebase
+          </button>
+          <button class="btn btn-primary" style="font-size:12px; flex:1.2;" onclick="syncWithFirebase()">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            Simpan & Sync Firebase
+          </button>
+        </div>
+      </div>
+
+      <!-- Database Local & Offline Backup / Restore -->
+      <div style="border-top:1px solid var(--border-subtle); margin-top:14px; padding-top:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Database Lokal (IndexedDB & File JSON)</span>
+          <span class="badge badge-sky" id="indexedDbBadge">IndexedDB Aktif</span>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-white" style="font-size:11.5px; flex:1;" onclick="exportDatabaseJSON()">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Backup DB (.json)
+          </button>
+          <input type="file" id="inputImportDbFile" accept=".json,application/json" style="display:none;" onchange="importDatabaseJSON(event)">
+          <button class="btn btn-white" style="font-size:11.5px; flex:1;" onclick="document.getElementById('inputImportDbFile').click()">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            Restore DB (.json)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 15. Modal: Pusat Notifikasi & Pengingat Jadwal Rilis -->
+  <div class="modal-backdrop" id="modalNotificationCenter">
+    <div class="modal-box" style="max-width:540px; max-height:85vh; overflow-y:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:36px; height:36px; border-radius:50%; background:var(--kawaii-yellow); display:flex; align-items:center; justify-content:center; color:var(--text-dark);">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          </div>
+          <div>
+            <strong style="font-size:16px; color:var(--text-dark);">Pusat Notifikasi & Jadwal Tayang</strong>
+            <div style="font-size:11.5px; color:var(--text-muted);">Pengingat rilis konten & deadline produksi AI</div>
+          </div>
+        </div>
+        <button style="border:none; background:transparent; color:var(--text-muted); cursor:pointer;" onclick="closeModal('modalNotificationCenter')">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <!-- Permission Status Box -->
+      <div style="background:var(--bg-subtle); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:12px; margin-bottom:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Izin Notifikasi OS / Browser:</span>
+          <span class="badge" id="notifPermissionBadge">Memeriksa...</span>
+        </div>
+        <div style="font-size:12px; color:var(--text-body); line-height:1.5; margin-bottom:8px;">
+          Aktifkan notifikasi agar HP / Laptop kamu otomatis memunculkan pengingat saat video sudah "Siap Rilis", deadline rekaman suara, atau saat sinkronisasi cloud selesai.
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-primary" style="font-size:11.5px; flex:1;" id="btnReqNotifPerm" onclick="requestBrowserNotificationPermission()">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            Izinkan Notifikasi Desktop / HP
+          </button>
+          <button class="btn btn-white" style="font-size:11.5px; padding:6px 12px;" onclick="triggerTestNotification()">
+            🔔 Tes Notifikasi
+          </button>
+        </div>
+      </div>
+
+      <!-- Actionable Content Reminders List -->
+      <div style="margin-bottom:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <strong style="font-size:12.5px; color:var(--text-dark);">Antrean Pengingat Konten Kamu:</strong>
+          <span style="font-size:11px; color:var(--text-muted);" id="notifPendingCount">0 Pengingat</span>
+        </div>
+        <div id="notifRemindersList" style="display:flex; flex-direction:column; gap:8px;">
+          <!-- Dynamically populated by renderNotificationList() -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ========================================================================
        CORE LOGIC, STATE MANAGEMENT & INTERACTION HANDLERS
        ======================================================================== -->
@@ -2733,8 +3594,31 @@
       activeTab: 'home',
       activeProjectId: 1,
       currentMediaFilter: 'all',
+      currentVaultFilter: 'all',
       activeScriptSubtab: 'longform',
       activeSosmedTitleTab: 'youtube',
+      globalVault: {
+        openings: [
+          { id: 'gv_op_1', title: 'Intro Hook AI Standar', category: 'openings', content: 'Komputer pertama yang bisa mikir ternyata bukan pakai chip modern silikon, tapi tabung hampa yang panasnya bisa buat goreng telur...', note: 'Hook 3-5 detik pembuka video' },
+          { id: 'gv_op_2', title: 'Logo Bumper CraftAI 3D (00:03)', category: 'openings', content: 'Logo_CraftAI_3D.mp4', note: 'Video bumper 3 detik resolusi 4K' }
+        ],
+        endings: [
+          { id: 'gv_ed_1', title: 'Outro CTA Repo GitHub & Subscribe', category: 'endings', content: 'Semua source code, script riset, dan file pendukung udah gue taruh gratis di link bio/deskripsi. Jangan lupa subscribe buat update berikutnya!', note: 'Dipakai di penutup video panjang' },
+          { id: 'gv_ed_2', title: 'CTA Shorts / Follow Akun', category: 'endings', content: 'Follow akun ini biar lu ga ketinggalan info AI paling baru!', note: 'Outro 2 detik untuk konten vertikal' }
+        ],
+        cutscenes: [
+          { id: 'gv_cs_1', title: 'Meme Math Confusion', category: 'cutscenes', content: 'meme_math_lady.mp4', note: 'Muncul saat analogi konsep sulit' },
+          { id: 'gv_cs_2', title: 'Cyberpunk Glitch Wipe', category: 'cutscenes', content: 'transition_glitch.mov', note: 'Transisi perpindahan babak' },
+          { id: 'gv_cs_3', title: 'B-Roll Terminal Coding Matrix', category: 'cutscenes', content: 'broll_terminal_matrix.mp4', note: 'Footage ketikan terminal Linux' }
+        ],
+        sfx: [
+          { id: 'gv_sf_1', title: 'Whoosh Fast Cinematic', category: 'sfx', content: 'Whoosh Fast', duration: '0.3s', note: 'Untuk transisi cepat' },
+          { id: 'gv_sf_2', title: 'Apple Ding / Bell', category: 'sfx', content: 'Ding Notification', duration: '0.4s', note: 'Untuk highlight poin' },
+          { id: 'gv_sf_3', title: 'Pop Bubble Clean', category: 'sfx', content: 'Pop Bubble', duration: '0.2s', note: 'Untuk icon / teks pop up' },
+          { id: 'gv_sf_4', title: 'Cash Register Ka-Ching (Cuan)', category: 'sfx', content: 'Cash Register Ding', duration: '0.8s', note: 'Untuk topik monetisasi & cuan' },
+          { id: 'gv_sf_5', title: 'Deep Sub Riser Tension', category: 'sfx', content: 'Sub Riser Build-up', duration: '1.8s', note: 'Untuk tensi sebelum kesimpulan' }
+        ]
+      },
       projects: {
         1: {
           id: 1,
@@ -2745,9 +3629,9 @@
           targetDuration: "10-12 Menit",
           research: {
             links: [
-              { id: 'l1', title: 'Paper Turing (1950)', url: 'https://academic.oup.com/mind/article/LIX/236/433/986238', type: 'Paper Sejarah' },
-              { id: 'l2', title: 'Attention Is All You Need (arXiv)', url: 'https://arxiv.org/abs/1706.03762', type: 'arXiv' },
-              { id: 'l3', title: 'LMSYS Chatbot Arena Leaderboard', url: 'https://chat.lmsys.org/?leaderboard', type: 'Benchmark' }
+              { id: 'l1', title: 'Paper Turing (1950)', url: 'https://academic.oup.com/mind/article/LIX/236/433/986238', type: 'Paper Sejarah', desc: 'Paper dasar Alan Turing yang mengusulkan konsep Imitation Game' },
+              { id: 'l2', title: 'Attention Is All You Need (arXiv)', url: 'https://arxiv.org/abs/1706.03762', type: 'arXiv', desc: 'Paper revolusioner penemu arsitektur Transformer dasar ChatGPT & Claude' },
+              { id: 'l3', title: 'LMSYS Chatbot Arena Leaderboard', url: 'https://chat.lmsys.org/?leaderboard', type: 'Benchmark', desc: 'Peringkat ELO model AI dunia berdasarkan blind vote manusia' }
             ],
             notes: [
               { id: 'n1', title: 'Kelahiran Imitation Game', content: 'Alan Turing merumuskan paper tahun 1950: bisakah mesin meniru tingkah laku manusia hingga tak bisa dibedakan?' },
@@ -3004,6 +3888,7 @@
     };
 
     const DEFAULT_PROJECTS = JSON.parse(JSON.stringify(state.projects));
+    const DEFAULT_VAULT = JSON.parse(JSON.stringify(state.globalVault));
 
     // =========================================================================
     // PERSISTENCE (LOCAL STORAGE)
@@ -3012,10 +3897,14 @@
       try {
         localStorage.setItem('craftai_studio_state', JSON.stringify({
           activeProjectId: state.activeProjectId,
-          projects: state.projects
+          projects: state.projects,
+          globalVault: state.globalVault
         }));
       } catch (e) {
         console.warn('LocalStorage save failed:', e);
+      }
+      if (typeof saveToIndexedDB === 'function') {
+        saveToIndexedDB();
       }
     }
 
@@ -3091,6 +3980,9 @@
               state.activeProjectId = isNaN(keys[0]) ? keys[0] : parseInt(keys[0], 10);
             }
           }
+          if (parsed && parsed.globalVault) {
+            state.globalVault = parsed.globalVault;
+          }
         }
       } catch (e) {
         console.warn('LocalStorage load failed:', e);
@@ -3098,6 +3990,9 @@
       if (!state.projects || Object.keys(state.projects).length === 0) {
         state.projects = JSON.parse(JSON.stringify(DEFAULT_PROJECTS));
         state.activeProjectId = 1;
+      }
+      if (!state.globalVault) {
+        state.globalVault = JSON.parse(JSON.stringify(DEFAULT_VAULT));
       }
       if (!state.projects[state.activeProjectId]) {
         const keys = Object.keys(state.projects);
@@ -3399,11 +4294,66 @@
       renderReviewPane();
       renderPackagingPane();
       renderOutputPane();
+      updateFloatingBar();
     }
 
     // =========================================================================
     // MENU 0: HOME REKAP (Summary & Master Data Table with Delete Action)
     // =========================================================================
+    function openPillarRatioModal() {
+      const list = Object.values(state.projects);
+      let fCount = 0, kCount = 0, pCount = 0;
+      list.forEach(p => {
+        const pil = (p.pillar || '').toLowerCase();
+        if (pil.includes('fondasi') || pil.includes('sejarah')) fCount++;
+        else if (pil.includes('konsep') || pil.includes('taksonomi')) kCount++;
+        else pCount++;
+      });
+      const totProjects = list.length || 1;
+      const fPct = Math.round((fCount / totProjects) * 100);
+      const kPct = Math.round((kCount / totProjects) * 100);
+      const pPct = Math.round((pCount / totProjects) * 100);
+
+      const totEl = document.getElementById('pillarModalTotal');
+      if (totEl) totEl.innerText = `${list.length} Video Terdaftar`;
+
+      const breakdownEl = document.getElementById('pillarModalBreakdown');
+      if (breakdownEl) {
+        breakdownEl.innerHTML = `
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
+              <span style="font-weight:600; color:#15803d;">1. Fondasi & Sejarah (Target: 40%)</span>
+              <strong>${fCount} Video (${fPct}%)</strong>
+            </div>
+            <div style="background:#e2e8f0; height:7px; border-radius:99px; overflow:hidden;">
+              <div style="background:#10b981; height:100%; width:${fPct}%;"></div>
+            </div>
+          </div>
+
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
+              <span style="font-weight:600; color:#6b21a8;">2. Taksonomi & Konsep (Target: 40%)</span>
+              <strong>${kCount} Video (${kPct}%)</strong>
+            </div>
+            <div style="background:#e2e8f0; height:7px; border-radius:99px; overflow:hidden;">
+              <div style="background:#8b5cf6; height:100%; width:${kPct}%;"></div>
+            </div>
+          </div>
+
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
+              <span style="font-weight:600; color:#b45309;">3. Update & Showcase APK (Target: 20%)</span>
+              <strong>${pCount} Video (${pPct}%)</strong>
+            </div>
+            <div style="background:#e2e8f0; height:7px; border-radius:99px; overflow:hidden;">
+              <div style="background:#f59e0b; height:100%; width:${pPct}%;"></div>
+            </div>
+          </div>
+        `;
+      }
+      openModal('modalPillarRatio');
+    }
+
     function renderHomeRekap() {
       const tbody = document.getElementById('homeMasterTableBody');
       const mCards = document.getElementById('homeMasterCardsList');
@@ -3415,9 +4365,68 @@
       if (totalProjectsElem) totalProjectsElem.innerText = `${list.length} Video`;
 
       let totAudio = 0;
-      list.forEach(p => totAudio += (p.audioTakes ? p.audioTakes.length : 0));
+      let fCount = 0, kCount = 0, pCount = 0;
+      let readyCount = 0;
+
+      list.forEach(p => {
+        totAudio += (p.audioTakes ? p.audioTakes.length : 0);
+
+        const pil = (p.pillar || '').toLowerCase();
+        if (pil.includes('fondasi') || pil.includes('sejarah')) fCount++;
+        else if (pil.includes('konsep') || pil.includes('taksonomi')) kCount++;
+        else pCount++;
+
+        if (p.review && p.review.uploadStatus) {
+          const vals = Object.values(p.review.uploadStatus);
+          if (vals.some(v => v === 'Siap Rilis' || v === 'Sudah Tayang')) {
+            readyCount++;
+          }
+        }
+      });
+
       const totalAudioElem = document.getElementById('homeTotalAudio');
       if (totalAudioElem) totalAudioElem.innerText = `${totAudio} Take`;
+
+      const totProjects = list.length || 1;
+      const fPct = Math.round((fCount / totProjects) * 100);
+      const kPct = Math.round((kCount / totProjects) * 100);
+      const pPct = Math.round((pCount / totProjects) * 100);
+
+      const pillarRatioElem = document.getElementById('homePillarRatio');
+      if (pillarRatioElem) {
+        pillarRatioElem.innerText = `${fPct} / ${kPct} / ${pPct}`;
+      }
+      const pillarStatusElem = document.getElementById('homePillarStatus');
+      if (pillarStatusElem) {
+        if (list.length === 0) {
+          pillarStatusElem.className = 'badge badge-gray';
+          pillarStatusElem.innerText = 'Belum Ada Konten';
+        } else if (Math.abs(fPct - 40) <= 15 && Math.abs(kPct - 40) <= 15) {
+          pillarStatusElem.className = 'badge badge-mint';
+          pillarStatusElem.innerText = '✓ Seimbang & Sehat • Klik Detail';
+        } else {
+          pillarStatusElem.className = 'badge badge-amber';
+          pillarStatusElem.innerText = '⚠️ Butuh Penyesuaian • Klik Detail';
+        }
+      }
+
+      const uploadReadinessElem = document.getElementById('homeUploadReadiness');
+      if (uploadReadinessElem) {
+        uploadReadinessElem.innerText = `${readyCount} / ${list.length} Siap`;
+      }
+      const uploadBadgeElem = document.getElementById('homeUploadBadge');
+      if (uploadBadgeElem) {
+        if (readyCount === list.length && list.length > 0) {
+          uploadBadgeElem.className = 'badge badge-mint';
+          uploadBadgeElem.innerText = '✓ Semua Siap Rilis';
+        } else if (readyCount > 0) {
+          uploadBadgeElem.className = 'badge badge-amber';
+          uploadBadgeElem.innerText = 'Menuju Rilis';
+        } else {
+          uploadBadgeElem.className = 'badge badge-gray';
+          uploadBadgeElem.innerText = 'Masih Tahap Produksi';
+        }
+      }
 
       list.forEach(p => {
         const pillarBadgeClass = (p.pillar && p.pillar.includes('Fondasi')) ? 'badge-mint' : ((p.pillar && p.pillar.includes('Konsep')) ? 'badge-violet' : 'badge-amber');
@@ -3513,18 +4522,36 @@
       if (linksContainer) {
         linksContainer.innerHTML = '';
         const links = (proj.research && proj.research.links) ? proj.research.links : [];
+        if (links.length === 0) {
+          linksContainer.innerHTML = '<span style="font-size:12px; color:var(--text-muted); font-style:italic;">Belum ada tautan rujukan. Klik "Tambah Link" di atas.</span>';
+        }
         links.forEach((l, i) => {
           const chip = document.createElement('div');
+          chip.className = 'research-link-card';
           chip.style.display = 'inline-flex';
           chip.style.alignItems = 'center';
-          chip.style.gap = '4px';
+          chip.style.gap = '5px';
+          
+          const hasDesc = l.desc && l.desc.trim().length > 0;
+          const tooltip = hasDesc ? `${l.title} — ${l.desc}` : `${l.title} (${l.url})`;
+
           chip.innerHTML = `
-            <a href="${l.url}" target="_blank" class="link-pill">
+            <a href="${l.url}" target="_blank" class="link-pill" title="${tooltip}" style="display:inline-flex; align-items:center; gap:6px; text-decoration:none;">
               <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-              <span>${l.title}</span>
-              <span style="font-size:10px; color:var(--text-muted);">(${l.type})</span>
+              <div style="display:flex; flex-direction:column; line-height:1.2;">
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <span style="font-weight:600; color:var(--text-dark);">${l.title}</span>
+                  <span style="font-size:10px; color:var(--text-muted);">(${l.type})</span>
+                </div>
+                ${hasDesc ? `<span style="font-size:10.5px; color:var(--text-muted); max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${l.desc}</span>` : ''}
+              </div>
             </a>
-            <button style="border:none; background:transparent; color:#94a3b8; cursor:pointer; font-size:11px; padding:2px;" onclick="deleteLink(${i})">
+            ${hasDesc ? `
+              <button class="btn-micro" style="padding:1px 5px; font-size:10px;" onclick="showLinkInfoModal(${i})" title="Lihat Intisari Lengkap">
+                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </button>
+            ` : ''}
+            <button style="border:none; background:transparent; color:#94a3b8; cursor:pointer; font-size:11px; padding:3px; display:inline-flex; align-items:center;" onclick="deleteLink(${i})" title="Hapus Link">
               <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
           `;
@@ -3591,6 +4618,9 @@
 
       // 3. Structured Media Assets Table & Mobile Cards
       renderMediaTable();
+
+      // 4. Global Brand Kit & Asset Vault
+      renderBrandVault();
     }
 
     function renderMediaTable() {
@@ -3666,6 +4696,7 @@
       document.getElementById('inputLinkTitle').value = '';
       document.getElementById('inputLinkUrl').value = '';
       document.getElementById('inputLinkType').value = 'arXiv';
+      if (document.getElementById('inputLinkDesc')) document.getElementById('inputLinkDesc').value = '';
       openModal('modalAddLink');
     }
     function submitAddResearchLink() {
@@ -3673,16 +4704,37 @@
       const title = document.getElementById('inputLinkTitle').value.trim();
       const url = document.getElementById('inputLinkUrl').value.trim();
       const type = document.getElementById('inputLinkType').value.trim() || 'Rujukan';
+      const desc = document.getElementById('inputLinkDesc') ? document.getElementById('inputLinkDesc').value.trim() : '';
 
       if (!title || !url) {
         showToast('Nama rujukan dan URL wajib diisi!', 'error');
         return;
       }
-      proj.research.links.push({ id: 'l_' + Date.now(), title, url, type });
+      proj.research.links.push({ id: 'l_' + Date.now(), title, url, type, desc });
       saveState();
       closeModal('modalAddLink');
       renderRisetPane();
       showToast('Tautan riset berhasil ditambahkan', 'success');
+    }
+    function showLinkInfoModal(idx) {
+      const proj = state.projects[state.activeProjectId];
+      if (!proj || !proj.research || !proj.research.links || !proj.research.links[idx]) return;
+      const l = proj.research.links[idx];
+      const titleEl = document.getElementById('modalLinkInfoTitle');
+      const urlEl = document.getElementById('modalLinkInfoUrl');
+      const typeEl = document.getElementById('modalLinkInfoType');
+      const descEl = document.getElementById('modalLinkInfoDesc');
+      const openBtn = document.getElementById('modalLinkInfoOpenBtn');
+
+      if (titleEl) titleEl.innerText = l.title;
+      if (urlEl) {
+        urlEl.href = l.url;
+        urlEl.innerText = l.url;
+      }
+      if (typeEl) typeEl.innerText = l.type;
+      if (descEl) descEl.innerText = l.desc || 'Belum ada ringkasan deskripsi khusus untuk tautan ini.';
+      if (openBtn) openBtn.href = l.url;
+      openModal('modalLinkInfo');
     }
     function deleteLink(i) {
       const proj = state.projects[state.activeProjectId];
@@ -3692,6 +4744,232 @@
         renderRisetPane();
         showToast('Tautan riset dihapus', 'info');
       }
+    }
+
+    // =========================================================================
+    // BRAND KIT & ASSET VAULT FAVORIT (LINTAS VIDEO)
+    // =========================================================================
+    function renderBrandVault() {
+      const grid = document.getElementById('vaultCardsGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      if (!state.globalVault) {
+        state.globalVault = { openings: [], endings: [], cutscenes: [], sfx: [] };
+      }
+
+      const activeCat = state.currentVaultFilter || 'all';
+      let items = [];
+
+      if (activeCat === 'all') {
+        Object.keys(state.globalVault).forEach(k => {
+          (state.globalVault[k] || []).forEach(it => items.push({ ...it, catKey: k }));
+        });
+      } else {
+        (state.globalVault[activeCat] || []).forEach(it => items.push({ ...it, catKey: activeCat }));
+      }
+
+      if (items.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column:1/-1; text-align:center; padding:32px; color:var(--text-muted); background:var(--bg-subtle); border-radius:var(--radius-md); border:1.5px dashed var(--border-subtle);">
+            <div style="display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:50%; background:var(--kawaii-yellow); margin-bottom:8px;">
+              <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--text-dark)" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+            <strong style="font-size:13.5px; color:var(--text-dark); display:block;">Belum ada asset di kategori ini</strong>
+            <p style="font-size:12px; margin-top:4px;">Klik tombol "Tambah Asset Vault" di atas untuk menyimpan opening, outro, cutscene, atau SFX favorit kamu.</p>
+          </div>
+        `;
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'vault-card';
+
+        const catBadgeClass = item.catKey === 'openings' ? 'badge-mint' : (item.catKey === 'endings' ? 'badge-amber' : (item.catKey === 'cutscenes' ? 'badge-violet' : 'badge-sky'));
+        
+        let catIcon = '';
+        let catText = 'Asset';
+        if (item.catKey === 'openings') {
+          catIcon = `<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+          catText = 'Opening';
+        } else if (item.catKey === 'endings') {
+          catIcon = `<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><polygon points="12 8 8 12 12 16 12 8"></polygon></svg>`;
+          catText = 'Ending';
+        } else if (item.catKey === 'cutscenes') {
+          catIcon = `<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>`;
+          catText = 'Cutscene';
+        } else {
+          catIcon = `<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+          catText = 'SFX';
+        }
+
+        card.innerHTML = `
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:6px; margin-bottom:6px;">
+              <span class="badge ${catBadgeClass}" style="font-size:10px; display:inline-flex; align-items:center; gap:4px;">
+                ${catIcon} ${catText}
+              </span>
+              <button style="border:none; background:transparent; color:#94a3b8; cursor:pointer; padding:2px;" onclick="deleteVaultItem('${item.catKey}', '${item.id}')" title="Hapus dari Vault">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            <strong style="font-size:13.5px; color:var(--text-dark); display:block; margin-bottom:4px;">${item.title}</strong>
+            <div style="font-size:12px; color:var(--text-body); background:var(--bg-window); padding:8px 10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); line-height:1.45; word-break:break-word;">
+              ${item.content}
+            </div>
+            ${item.note ? `
+              <div style="font-size:11px; color:var(--text-muted); margin-top:5px; display:inline-flex; align-items:center; gap:4px;">
+                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                ${item.note}
+              </div>
+            ` : ''}
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-subtle); padding-top:8px; margin-top:4px;">
+            <span style="font-size:10.5px; color:var(--text-muted); display:inline-flex; align-items:center; gap:4px;">
+              <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              ${item.duration ? item.duration : 'Reusable Asset'}
+            </span>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-white" style="font-size:11px; padding:3px 9px;" onclick="copyVaultContent('${escapeHtmlAttr(item.content)}')" title="Salin teks asset">
+                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                Salin
+              </button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function escapeHtmlAttr(str) {
+      if (!str) return '';
+      return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    function filterVault(cat) {
+      state.currentVaultFilter = cat;
+      document.querySelectorAll('.vault-filter-btn').forEach(b => {
+        b.classList.remove('active');
+      });
+      const activeBtn = document.getElementById(`vaultFilterBtn_${cat}`);
+      if (activeBtn) activeBtn.classList.add('active');
+      renderBrandVault();
+    }
+
+    function openAddVaultModal() {
+      document.getElementById('inputVaultCategory').value = 'openings';
+      document.getElementById('inputVaultTitle').value = '';
+      document.getElementById('inputVaultContent').value = '';
+      document.getElementById('inputVaultNote').value = '';
+      openModal('modalAddVault');
+    }
+
+    function submitAddVault() {
+      const cat = document.getElementById('inputVaultCategory').value;
+      const title = document.getElementById('inputVaultTitle').value.trim();
+      const content = document.getElementById('inputVaultContent').value.trim();
+      const note = document.getElementById('inputVaultNote').value.trim();
+
+      if (!title || !content) {
+        showToast('Judul dan konten asset wajib diisi!', 'error');
+        return;
+      }
+
+      if (!state.globalVault) state.globalVault = { openings: [], endings: [], cutscenes: [], sfx: [] };
+      if (!state.globalVault[cat]) state.globalVault[cat] = [];
+
+      state.globalVault[cat].push({
+        id: 'gv_' + Date.now(),
+        title,
+        category: cat,
+        content,
+        note
+      });
+
+      saveState();
+      closeModal('modalAddVault');
+      renderBrandVault();
+      showToast('Asset berhasil disimpan ke Brand Vault ⭐', 'success');
+    }
+
+    function deleteVaultItem(cat, id) {
+      if (!state.globalVault || !state.globalVault[cat]) return;
+      state.globalVault[cat] = state.globalVault[cat].filter(it => it.id !== id);
+      saveState();
+      renderBrandVault();
+      showToast('Asset dihapus dari Vault', 'info');
+    }
+
+    function copyVaultContent(text) {
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Konten asset disalin ke clipboard!', 'success');
+      }).catch(() => {
+        showToast('Berhasil disalin: ' + text.substring(0, 30) + '...', 'info');
+      });
+    }
+
+    // Vault Selector for Script Segments
+    let vaultSelectorContext = null;
+    function openVaultSelector(targetField, segIdx) {
+      vaultSelectorContext = { targetField, segIdx };
+      const catKey = targetField === 'cutscene' ? 'cutscenes' : 'sfx';
+      const titleEl = document.getElementById('modalVaultSelectorTitle');
+      if (titleEl) {
+        titleEl.innerText = targetField === 'cutscene' ? 'Pilih Cutscene / Transisi Favorit' : 'Pilih Efek Suara (SFX) Favorit';
+      }
+
+      const container = document.getElementById('modalVaultSelectorItems');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (!state.globalVault) state.globalVault = { openings: [], endings: [], cutscenes: [], sfx: [] };
+      const list = state.globalVault[catKey] || [];
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:24px; color:var(--text-muted); font-size:12.5px;">
+            Belum ada asset tersimpan di kategori ini. Buka tab "Riset & Aset" ➔ "Brand Vault" untuk menambahkannya.
+          </div>
+        `;
+      } else {
+        list.forEach(item => {
+          const row = document.createElement('div');
+          row.style.display = 'flex';
+          row.style.alignItems = 'center';
+          row.style.justifyContent = 'space-between';
+          row.style.padding = '10px 14px';
+          row.style.background = 'var(--bg-subtle)';
+          row.style.borderRadius = 'var(--radius-sm)';
+          row.style.border = '1px solid var(--border-subtle)';
+          row.style.cursor = 'pointer';
+          row.style.transition = 'all 0.15s ease';
+
+          row.onmouseover = () => { row.style.background = '#ffffff'; row.style.borderColor = 'var(--primary)'; };
+          row.onmouseout = () => { row.style.background = 'var(--bg-subtle)'; row.style.borderColor = 'var(--border-subtle)'; };
+
+          row.onclick = () => {
+            applyVaultItemToScript(targetField, segIdx, item.content || item.title);
+          };
+
+          row.innerHTML = `
+            <div>
+              <strong style="font-size:13px; color:var(--text-dark); display:block;">${item.title}</strong>
+              <span style="font-size:11.5px; color:var(--text-muted);">${item.content} ${item.duration ? `(${item.duration})` : ''}</span>
+            </div>
+            <button class="btn btn-white" style="font-size:11px; padding:3px 9px;">+ Gunakan</button>
+          `;
+          container.appendChild(row);
+        });
+      }
+      openModal('modalVaultSelector');
+    }
+
+    function applyVaultItemToScript(targetField, segIdx, value) {
+      const field = targetField === 'cutscene' ? 'editDirection' : 'sfx';
+      appendLongformDirective(segIdx, field, value);
+      closeModal('modalVaultSelector');
     }
 
     // Note handlers
@@ -3853,6 +5131,9 @@
                 <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">${countWords(s.narr)} kata</span>
               </div>
               <textarea class="script-textarea" oninput="onLongformNarrEdit(${idx}, this.value)" placeholder="Tulis kalimat suara narasi...">${s.narr}</textarea>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+                <input type="text" class="edit-cue-input" style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted); background:var(--bg-subtle); padding:4px 8px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); max-width:160px;" value="${s.timecode || ''}" onchange="onLongformTimecode(${idx}, this.value)" placeholder="⏱️ Est: 00:00 - 00:10">
+              </div>
             </div>
 
             <!-- KANAN: FOOTAGE SLOT (Bukan cuma kalimat!) -->
@@ -3897,7 +5178,49 @@
                 `}
               </div>
 
-              <textarea class="script-textarea" style="background:#fafcff; min-height:60px;" oninput="onLongformCueEdit(${idx}, this.value)" placeholder="Catatan visual tambahan (misal: munculkan diagram pas detik ke-5)...">${s.cue}</textarea>
+              <textarea class="script-textarea" style="background:#fafcff; min-height:55px;" oninput="onLongformCueEdit(${idx}, this.value)" placeholder="Catatan visual tambahan (misal: munculkan diagram pas detik ke-5)...">${s.cue}</textarea>
+
+              <!-- Edit Direction & SFX Timeline Cue Row -->
+              <div class="edit-cue-row">
+                <div class="edit-cue-box">
+                  <div class="edit-cue-label" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <span style="display:inline-flex; align-items:center; gap:5px; color:var(--text-dark); font-weight:700;">
+                      <svg viewBox="0 0 24 24" width="13" height="13" stroke="var(--coral)" stroke-width="2.2" fill="none"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
+                      Cut / Transisi Visual
+                    </span>
+                    <button type="button" class="btn-micro" onclick="openVaultSelector('cutscene', ${idx})" title="Pilih dari Cutscene Favorit Vault">⭐ Vault</button>
+                  </div>
+                  <input type="text" id="editDirInput_${idx}" class="edit-cue-input" value="${s.editDirection || ''}" oninput="onLongformEditDirection(${idx}, this.value)" placeholder="Misal: Jump Cut, Zoom In 110%">
+                  <!-- Quick Preset Chips -->
+                  <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:5px;">
+                    <button type="button" class="btn-micro" onclick="appendLongformDirective(${idx}, 'editDirection', 'Jump Cut')">+ Jump Cut</button>
+                    <button type="button" class="btn-micro" onclick="appendLongformDirective(${idx}, 'editDirection', 'Zoom In 115%')">+ Zoom In</button>
+                    <button type="button" class="btn-micro" onclick="appendLongformDirective(${idx}, 'editDirection', 'Whip Pan')">+ Whip Pan</button>
+                    <button type="button" class="btn-micro" onclick="appendLongformDirective(${idx}, 'editDirection', 'Glitch')">+ Glitch</button>
+                    <button type="button" class="btn-micro" onclick="appendLongformDirective(${idx}, 'editDirection', 'B-Roll Full')">+ B-Roll</button>
+                  </div>
+                </div>
+
+                <div class="edit-cue-box">
+                  <div class="edit-cue-label" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <span style="display:inline-flex; align-items:center; gap:5px; color:var(--text-dark); font-weight:700;">
+                      <svg viewBox="0 0 24 24" width="13" height="13" stroke="var(--sky)" stroke-width="2.2" fill="none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                      Efek Suara (SFX)
+                    </span>
+                    <button type="button" class="btn-micro" onclick="openVaultSelector('sfx', ${idx})" title="Pilih dari SFX Favorit Vault">⭐ Vault</button>
+                  </div>
+                  <input type="text" id="sfxInput_${idx}" class="edit-cue-input" value="${s.sfx || ''}" oninput="onLongformSfx(${idx}, this.value)" placeholder="Misal: Whoosh, Ding, Riser">
+                  <!-- Quick Preset Chips -->
+                  <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:5px;">
+                    <button type="button" class="btn-micro" onclick="appendLongformDirective(${idx}, 'sfx', 'Whoosh Fast')">+ Whoosh</button>
+                    <button type="button" class="btn-micro" onclick="appendLongformDirective(${idx}, 'sfx', 'Ding Bell')">+ Ding</button>
+                    <button type="button" class="btn-micro" onclick="appendLongformDirective(${idx}, 'sfx', 'Pop')">+ Pop</button>
+                    <button type="button" class="btn-micro" onclick="appendLongformDirective(${idx}, 'sfx', 'Keyboard Typing')">+ Typing</button>
+                    <button type="button" class="btn-micro" onclick="appendLongformDirective(${idx}, 'sfx', 'Ka-Ching Cuan')">+ Cuan</button>
+                    <button type="button" class="btn-micro" onclick="appendLongformDirective(${idx}, 'sfx', 'Deep Riser')">+ Riser</button>
+                  </div>
+                </div>
+              </div>
             </div>
           `;
           longContainer.appendChild(row);
@@ -4101,6 +5424,9 @@
       if (tbody) tbody.innerHTML = '';
       if (mAudio) mAudio.innerHTML = '';
 
+      // Render Teleprompter Studio
+      renderTeleprompter();
+
       if (!proj.audioTakes || proj.audioTakes.length === 0) {
         if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">Belum ada file rekaman suara untuk konten ini. Klik "Tambah Take Audio".</td></tr>`;
         if (mAudio) mAudio.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:16px;">Belum ada file rekaman suara. Klik "Tambah Take Audio".</div>`;
@@ -4109,25 +5435,34 @@
 
       proj.audioTakes.forEach((at, idx) => {
         const statusBadge = at.status === 'approved' ? '<span class="badge badge-mint">✓ Approved</span>' : '<span class="badge badge-amber">⏳ Retake</span>';
+        const bestBadge = at.isBestTake ? '<span class="take-best-badge"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" style="color:var(--amber); vertical-align:-1px; margin-right:4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>TAKE UTAMA EDIT</span>' : '';
 
         // Desktop Row
         if (tbody) {
           const tr = document.createElement('tr');
+          if (at.isBestTake) tr.style.background = '#f0fdf4';
           tr.innerHTML = `
             <td style="font-family:var(--font-mono); font-size:11.5px; color:var(--text-muted);">#0${idx + 1}</td>
-            <td><span class="badge badge-violet">${at.part}</span></td>
+            <td>
+              <span class="badge badge-violet">${at.part}</span>
+              ${bestBadge}
+            </td>
             <td><strong style="color:var(--text-dark);">${at.file}</strong></td>
             <td style="font-family:var(--font-mono); font-size:12px;">${at.duration}</td>
             <td style="font-size:12px; color:var(--text-muted);">${at.quality}</td>
             <td>${statusBadge}</td>
             <td style="text-align:right; white-space:nowrap;">
+              <button class="btn ${at.isBestTake ? 'btn-primary' : 'btn-white'}" style="padding:3px 8px; font-size:11px;" onclick="toggleBestTake(${idx})" title="Tandai take ini yang masuk ke timeline editing">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="${at.isBestTake ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <span>${at.isBestTake ? 'Utama' : 'Pilih'}</span>
+              </button>
               <button class="btn btn-coral" style="padding:3px 8px; font-size:11px;" onclick="showToast('Memutar audio: ${at.file}', 'info')">
                 <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                 Putar
               </button>
               <button class="btn btn-white" style="padding:3px 8px; font-size:11px;" onclick="openEditAudioModal(${idx})">
                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                Edit Path
+                Edit
               </button>
               <button class="btn btn-white" style="padding:3px 6px; font-size:11px; color:#ef4444;" onclick="deleteAudioTake(${idx})">
                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -4141,25 +5476,34 @@
         if (mAudio) {
           const card = document.createElement('div');
           card.className = 'mobile-data-card';
+          if (at.isBestTake) card.style.borderColor = '#10b981';
           card.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
               <div style="display:flex; align-items:center; gap:6px;">
                 <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">#0${idx + 1}</span>
                 <span class="badge badge-violet" style="font-size:10px;">${at.part}</span>
               </div>
-              ${statusBadge}
+              <div style="display:flex; gap:4px;">
+                ${bestBadge}
+                ${statusBadge}
+              </div>
             </div>
             <strong style="font-size:13px; color:var(--text-dark); word-break:break-all;">${at.file}</strong>
-            <div style="font-size:11.5px; color:var(--text-muted); display:flex; gap:10px;">
-              <span>⏱️ ${at.duration}</span>
-              <span>• 🎚️ ${at.quality}</span>
+            <div style="font-size:11.5px; color:var(--text-muted); display:flex; gap:10px; align-items:center;">
+              <span style="display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ${at.duration}</span>
+              <span>•</span>
+              <span style="display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg> ${at.quality}</span>
             </div>
             <div style="display:flex; gap:6px; border-top:1px solid var(--border-subtle); padding-top:8px;">
+              <button class="btn ${at.isBestTake ? 'btn-primary' : 'btn-white'}" style="padding:5px 8px; font-size:11px;" onclick="toggleBestTake(${idx})">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="${at.isBestTake ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <span>${at.isBestTake ? 'Utama' : 'Pilih Utama'}</span>
+              </button>
               <button class="btn btn-coral" style="flex:1; padding:5px 8px; font-size:11px; justify-content:center;" onclick="showToast('Memutar audio: ${at.file}', 'info')">
                 <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                 Putar
               </button>
-              <button class="btn btn-white" style="padding:5px 8px; font-size:11px;" onclick="openEditAudioModal(${idx})">Edit Path</button>
+              <button class="btn btn-white" style="padding:5px 8px; font-size:11px;" onclick="openEditAudioModal(${idx})">Edit</button>
               <button class="btn btn-white" style="padding:5px 7px; font-size:11px; color:#ef4444;" onclick="deleteAudioTake(${idx})">
                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
@@ -4385,13 +5729,32 @@
         }
       }
 
-      // Upload Badges
+      // Upload Badges (Interactive clickable status togglers)
       const badgesContainer = document.getElementById('uploadStatusBadges');
       if (badgesContainer && proj.review && proj.review.uploadStatus) {
+        const getBadgeClass = (status) => {
+          if (status === 'Siap Rilis') return 'badge-mint';
+          if (status === 'Sudah Tayang') return 'badge-sky';
+          return 'badge-amber';
+        };
+
+        const ytStatus = proj.review.uploadStatus.youtube || 'Draft';
+        const ttStatus = proj.review.uploadStatus.tiktok || 'Draft';
+        const rlStatus = proj.review.uploadStatus.reels || 'Draft';
+
         badgesContainer.innerHTML = `
-          <span class="badge badge-mint">YT: ${proj.review.uploadStatus.youtube || 'Draft'}</span>
-          <span class="badge badge-mint">TikTok: ${proj.review.uploadStatus.tiktok || 'Draft'}</span>
-          <span class="badge badge-amber">Reels: ${proj.review.uploadStatus.reels || 'Draft'}</span>
+          <button type="button" class="badge ${getBadgeClass(ytStatus)}" style="cursor:pointer; border:none; display:inline-flex; align-items:center; gap:5px; transition:transform 0.15s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" onclick="cycleUploadStatus('youtube')" title="Klik untuk ubah status YouTube (Draft ➔ Siap Rilis ➔ Sudah Tayang)">
+            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            YT: ${ytStatus}
+          </button>
+          <button type="button" class="badge ${getBadgeClass(ttStatus)}" style="cursor:pointer; border:none; display:inline-flex; align-items:center; gap:5px; transition:transform 0.15s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" onclick="cycleUploadStatus('tiktok')" title="Klik untuk ubah status TikTok (Draft ➔ Siap Rilis ➔ Sudah Tayang)">
+            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>
+            TikTok: ${ttStatus}
+          </button>
+          <button type="button" class="badge ${getBadgeClass(rlStatus)}" style="cursor:pointer; border:none; display:inline-flex; align-items:center; gap:5px; transition:transform 0.15s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" onclick="cycleUploadStatus('reels')" title="Klik untuk ubah status Reels (Draft ➔ Siap Rilis ➔ Sudah Tayang)">
+            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            Reels: ${rlStatus}
+          </button>
         `;
       }
 
@@ -4445,6 +5808,9 @@
           mQc.appendChild(card);
         }
       });
+
+      // Render Timestamped Video Revisions
+      renderVideoRevisions();
     }
 
     function toggleQcItem(idx) {
@@ -4456,6 +5822,23 @@
         renderReviewPane();
         showToast(item.checked ? 'Poin QC dicentang' : 'Poin QC dibatalkan', 'info');
       }
+    }
+
+    function cycleUploadStatus(platform) {
+      const proj = state.projects[state.activeProjectId];
+      if (!proj || !proj.review || !proj.review.uploadStatus) return;
+
+      const current = proj.review.uploadStatus[platform] || 'Draft';
+      let next = 'Draft';
+      if (current === 'Draft') next = 'Siap Rilis';
+      else if (current === 'Siap Rilis') next = 'Sudah Tayang';
+      else next = 'Draft';
+
+      proj.review.uploadStatus[platform] = next;
+      saveState();
+      renderReviewPane();
+      renderHomeRekap();
+      showToast(`Status ${platform.toUpperCase()} diubah: ${next}`, 'success');
     }
 
     function openAddQcModal() {
@@ -4516,19 +5899,91 @@
       }
     }
 
-    // Helper functions for direct file picking in Modals
+    // Helper functions for direct file picking in Modals with Automatic Aspect Ratio Detection
     function handleMediaAssetFileUpload(e) {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
-      document.getElementById('inputMediaName').value = file.name;
+
+      const nameInput = document.getElementById('inputMediaName');
+      const typeSelect = document.getElementById('inputMediaType');
+      const formatSelect = document.getElementById('inputMediaFormat');
+      const ratioBadge = document.getElementById('detectedRatioBadge');
+
+      if (nameInput) nameInput.value = file.name;
+
       if (file.type.startsWith('video/')) {
-        document.getElementById('inputMediaType').value = 'video';
+        if (typeSelect) typeSelect.value = 'video';
+        const url = URL.createObjectURL(file);
+        const tempVid = document.createElement('video');
+        tempVid.preload = 'metadata';
+        tempVid.src = url;
+        tempVid.onloadedmetadata = function() {
+          const w = tempVid.videoWidth || 1920;
+          const h = tempVid.videoHeight || 1080;
+          URL.revokeObjectURL(url);
+          const ratio = w / h;
+          let detected = '16:9';
+          if (ratio >= 1.25) detected = '16:9';
+          else if (ratio <= 0.85) detected = '9:16';
+          else detected = '1:1';
+
+          if (formatSelect) formatSelect.value = detected;
+          if (ratioBadge) {
+            ratioBadge.style.display = 'inline-block';
+            ratioBadge.innerText = `✨ ${detected} (${w}x${h})`;
+          }
+          showToast(`Format otomatis terdeteksi: ${detected} (${w}x${h})`, 'success');
+        };
+        tempVid.onerror = function() {
+          URL.revokeObjectURL(url);
+          showToast(`File video dipilih: ${file.name}`, 'info');
+        };
       } else if (file.type === 'image/gif') {
-        document.getElementById('inputMediaType').value = 'gif';
+        if (typeSelect) typeSelect.value = 'gif';
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = function() {
+          const w = img.naturalWidth;
+          const h = img.naturalHeight;
+          URL.revokeObjectURL(url);
+          const ratio = w / h;
+          let detected = '1:1';
+          if (ratio >= 1.25) detected = '16:9';
+          else if (ratio <= 0.85) detected = '9:16';
+
+          if (formatSelect) formatSelect.value = detected;
+          if (ratioBadge) {
+            ratioBadge.style.display = 'inline-block';
+            ratioBadge.innerText = `✨ ${detected} (${w}x${h})`;
+          }
+          showToast(`GIF terdeteksi: ${detected} (${w}x${h})`, 'success');
+        };
+        img.src = url;
       } else if (file.type.startsWith('image/')) {
-        document.getElementById('inputMediaType').value = 'foto';
+        if (typeSelect) typeSelect.value = 'foto';
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = function() {
+          const w = img.naturalWidth;
+          const h = img.naturalHeight;
+          URL.revokeObjectURL(url);
+          const ratio = w / h;
+          let detected = '16:9';
+          if (ratio >= 1.25) detected = '16:9';
+          else if (ratio <= 0.85) detected = '9:16';
+          else detected = '1:1';
+
+          if (formatSelect) formatSelect.value = detected;
+          if (ratioBadge) {
+            ratioBadge.style.display = 'inline-block';
+            ratioBadge.innerText = `✨ ${detected} (${w}x${h})`;
+          }
+          showToast(`Gambar terdeteksi: ${detected} (${w}x${h})`, 'success');
+        };
+        img.src = url;
+      } else {
+        showToast('File media dipilih: ' + file.name, 'info');
       }
-      showToast('File media dipilih: ' + file.name, 'info');
     }
 
     function handleAudioFileUpload(e) {
@@ -5043,6 +6498,894 @@
       return new Blob([view], { type: 'audio/wav' });
     }
 
+    // =========================================================================
+    // EDITING ASSISTANT: TIMELINE CUES & SCRIPT EDITS
+    // =========================================================================
+    function onLongformTimecode(idx, val) {
+      const proj = state.projects[state.activeProjectId];
+      if (proj && proj.scripts && proj.scripts.longform && proj.scripts.longform[idx]) {
+        proj.scripts.longform[idx].timecode = val;
+        saveState();
+      }
+    }
+
+    function onLongformEditDirection(idx, val) {
+      const proj = state.projects[state.activeProjectId];
+      if (proj && proj.scripts && proj.scripts.longform && proj.scripts.longform[idx]) {
+        proj.scripts.longform[idx].editDirection = val;
+        saveState();
+      }
+    }
+
+    function onLongformSfx(idx, val) {
+      const proj = state.projects[state.activeProjectId];
+      if (proj && proj.scripts && proj.scripts.longform && proj.scripts.longform[idx]) {
+        proj.scripts.longform[idx].sfx = val;
+        saveState();
+      }
+    }
+
+    function appendLongformDirective(idx, field, value) {
+      const proj = state.projects[state.activeProjectId];
+      if (!proj || !proj.scripts || !proj.scripts.longform || !proj.scripts.longform[idx]) return;
+      const seg = proj.scripts.longform[idx];
+      if (!seg[field]) {
+        seg[field] = value;
+      } else {
+        const parts = seg[field].split(',').map(s => s.trim()).filter(Boolean);
+        if (!parts.includes(value)) {
+          parts.push(value);
+          seg[field] = parts.join(', ');
+        }
+      }
+      saveState();
+      const elId = field === 'editDirection' ? `editDirInput_${idx}` : `sfxInput_${idx}`;
+      const inputEl = document.getElementById(elId);
+      if (inputEl) inputEl.value = seg[field];
+      showToast(`Ditambahkan ke naskah: ${value}`, 'info');
+    }
+
+    // =========================================================================
+    // EDITING ASSISTANT: EXPORT PANDUAN TIMELINE (CAPCUT / PREMIERE PRO)
+    // =========================================================================
+    function copyCapCutEditSheet() {
+      const proj = state.projects[state.activeProjectId];
+      if (!proj) return;
+      const longform = (proj.scripts && proj.scripts.longform) ? proj.scripts.longform : [];
+      const assets = (proj.research && proj.research.assets) ? proj.research.assets : [];
+
+      let out = `========================================================================\n`;
+      out += `🎬 CRAFTAI STUDIO — PANDUAN TIMELINE EDITING (CAPCUT / PREMIERE PRO)\n`;
+      out += `Judul Konten : ${proj.title}\n`;
+      out += `Pilar Konten : ${proj.pillar || '-'} | Target Durasi: ${proj.targetDuration || '10-12 Menit'}\n`;
+      out += `Total Segmen : ${longform.length} Segmen Naskah\n`;
+      out += `========================================================================\n\n`;
+
+      longform.forEach((s, i) => {
+        const attached = assets.find(a => a.id === s.attachedAssetId);
+        const estTime = s.timecode || `Est. ${(i * 15)}s - ${((i + 1) * 15)}s`;
+        const words = countWords(s.narr);
+
+        out += `------------------------------------------------------------------------\n`;
+        out += `[SEGMEN ${i + 1}: ${s.seg}] (${estTime} • ~${words} kata)\n`;
+        out += `------------------------------------------------------------------------\n`;
+        out += `🎙️ SUARA / NARASI:\n"${s.narr}"\n\n`;
+        out += `🎬 ASET FOOTAGE  : ${attached ? `[${attached.type.toUpperCase()}] ${attached.name} (${attached.format})` : 'A-Roll (Kamera Utama / Muka)'}\n`;
+        out += `✂️ ARAHAN VISUAL : ${s.cue || '-'}\n`;
+        out += `🎞️ TRANSISI/CUT  : ${s.editDirection || 'Cut Standar'}\n`;
+        out += `🔊 SOUND EFFECT  : ${s.sfx || '-'}\n\n`;
+      });
+
+      out += `========================================================================\n`;
+      out += `📁 DAFTAR ASSET FOOTAGE & MEDIA YANG PERLU DISIAPKAN:\n`;
+      if (assets.length === 0) {
+        out += `- (Belum ada aset media terdaftar di Riset)\n`;
+      } else {
+        assets.forEach((a, idx) => {
+          out += `${idx + 1}. [${a.type.toUpperCase()}] ${a.name} (${a.format}) - ${a.desc || 'Aset B-roll'}\n`;
+        });
+      }
+      out += `========================================================================\n`;
+
+      const previewArea = document.getElementById('capcutEditSheetPreview');
+      const statsElem = document.getElementById('capcutWordStats');
+      if (previewArea) previewArea.value = out;
+      if (statsElem) statsElem.innerText = `${longform.length} Segmen Naskah • ${assets.length} Aset Media`;
+      openModal('modalExportCapCut');
+    }
+
+    function copyCapCutSheetToClipboard() {
+      const previewArea = document.getElementById('capcutEditSheetPreview');
+      if (!previewArea) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(previewArea.value).then(() => {
+          showToast('Panduan edit CapCut/Premiere berhasil disalin ke clipboard!', 'success');
+        });
+      } else {
+        previewArea.select();
+        document.execCommand('copy');
+        showToast('Panduan edit CapCut/Premiere berhasil disalin ke clipboard!', 'success');
+      }
+      closeModal('modalExportCapCut');
+    }
+
+    // =========================================================================
+    // TELEPROMPTER MINI (AUDIO STUDIO)
+    // =========================================================================
+    let teleprompterFontSize = 14.5;
+    function renderTeleprompter() {
+      const proj = state.projects[state.activeProjectId];
+      if (!proj) return;
+      const body = document.getElementById('teleprompterTextBody');
+      const count = document.getElementById('teleprompterWordCount');
+      if (!body) return;
+
+      const longform = (proj.scripts && proj.scripts.longform) ? proj.scripts.longform : [];
+      if (longform.length === 0) {
+        body.innerText = 'Belum ada naskah narasi. Tulis naskah di Menu 2: Susun Script.';
+        if (count) count.innerText = '0 Kata';
+        return;
+      }
+
+      let totalWords = 0;
+      let text = '';
+      longform.forEach((s) => {
+        totalWords += countWords(s.narr);
+        text += `[${s.seg}]\n${s.narr}\n\n`;
+      });
+
+      body.innerText = text.trim();
+      body.style.fontSize = teleprompterFontSize + 'px';
+      if (count) count.innerText = `${totalWords} Kata (~${Math.ceil(totalWords / 130)} mnt bicara)`;
+    }
+
+    function changeTeleprompterFontSize(delta) {
+      teleprompterFontSize = Math.max(12, Math.min(24, teleprompterFontSize + delta * 2));
+      const body = document.getElementById('teleprompterTextBody');
+      if (body) body.style.fontSize = teleprompterFontSize + 'px';
+    }
+
+    function copyTeleprompterText() {
+      const body = document.getElementById('teleprompterTextBody');
+      if (!body) return;
+      navigator.clipboard.writeText(body.innerText).then(() => {
+        showToast('Naskah teleprompter berhasil disalin!', 'success');
+      });
+    }
+
+    // =========================================================================
+    // BEST TAKE MARKER (REKAMAN SUARA)
+    // =========================================================================
+    function toggleBestTake(idx) {
+      const proj = state.projects[state.activeProjectId];
+      if (!proj || !proj.audioTakes || !proj.audioTakes[idx]) return;
+      const wasBest = !!proj.audioTakes[idx].isBestTake;
+      proj.audioTakes.forEach((t, i) => {
+        if (i === idx) t.isBestTake = !wasBest;
+      });
+      saveState();
+      renderRekamanPane();
+      showToast(!wasBest ? 'Ditandai sebagai TAKE UTAMA EDIT' : 'Tanda take utama dilepas', 'success');
+    }
+
+    // =========================================================================
+    // VIDEO TIMESTAMPE REVISION NOTES (REVIEW VIDEO)
+    // =========================================================================
+    function renderVideoRevisions() {
+      const proj = state.projects[state.activeProjectId];
+      if (!proj || !proj.review) return;
+      const listElem = document.getElementById('videoRevisionsList');
+      const countElem = document.getElementById('reviewRevisionCount');
+      if (!listElem) return;
+      listElem.innerHTML = '';
+
+      if (!proj.review.revisions) proj.review.revisions = [];
+      const revs = proj.review.revisions;
+      if (countElem) countElem.innerText = `${revs.length} Revisi`;
+
+      if (revs.length === 0) {
+        listElem.innerHTML = `
+          <div style="font-size:12px; color:var(--text-muted); padding:10px; text-align:center; background:var(--bg-subtle); border-radius:var(--radius-sm);">
+            Belum ada catatan revisi. Putar video dan klik <strong>"Catat Revisi Detik Ini"</strong> untuk menandai bagian yang perlu diperbaiki.
+          </div>
+        `;
+        return;
+      }
+
+      revs.forEach((r, idx) => {
+        const item = document.createElement('div');
+        item.className = 'revision-item' + (r.done ? ' done' : '');
+        item.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
+            <input type="checkbox" ${r.done ? 'checked' : ''} onchange="toggleRevisionDone(${idx})" style="cursor:pointer; width:15px; height:15px;">
+            <button class="revision-timestamp-btn" onclick="seekVideoToTime(${r.timeSec || 0})" title="Lompat ke detik ini di video player">
+              <svg viewBox="0 0 24 24" width="9" height="9" fill="currentColor" style="vertical-align:0px; margin-right:3px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              <span>${r.time}</span>
+            </button>
+            <span class="revision-note-text">${r.note}</span>
+          </div>
+          <button style="border:none; background:transparent; color:#94a3b8; cursor:pointer;" onclick="deleteVideoRevision(${idx})" title="Hapus Catatan">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        `;
+        listElem.appendChild(item);
+      });
+    }
+
+    function openAddRevisionModal() {
+      const videoElem = document.getElementById('reviewVideoElement');
+      let curSec = 0;
+      if (videoElem && !isNaN(videoElem.currentTime)) {
+        curSec = Math.floor(videoElem.currentTime);
+      }
+      const m = Math.floor(curSec / 60);
+      const s = curSec % 60;
+      const timeStr = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+
+      const timeInput = document.getElementById('inputRevisionTimestamp');
+      const noteInput = document.getElementById('inputRevisionNote');
+      if (timeInput) timeInput.value = timeStr;
+      if (noteInput) noteInput.value = '';
+      openModal('modalAddRevision');
+    }
+
+    function captureCurrentVideoTime() {
+      const videoElem = document.getElementById('reviewVideoElement');
+      let curSec = 0;
+      if (videoElem && !isNaN(videoElem.currentTime)) {
+        curSec = Math.floor(videoElem.currentTime);
+      }
+      const m = Math.floor(curSec / 60);
+      const s = curSec % 60;
+      const timeStr = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      const timeInput = document.getElementById('inputRevisionTimestamp');
+      if (timeInput) timeInput.value = timeStr;
+    }
+
+    function submitVideoRevision() {
+      const proj = state.projects[state.activeProjectId];
+      if (!proj || !proj.review) return;
+      const timeStr = document.getElementById('inputRevisionTimestamp').value.trim() || '00:00';
+      const note = document.getElementById('inputRevisionNote').value.trim();
+
+      if (!note) {
+        showToast('Catatan arahan revisi wajib diisi!', 'error');
+        return;
+      }
+
+      const parts = timeStr.split(':');
+      let sec = 0;
+      if (parts.length === 2) {
+        sec = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+      } else {
+        sec = parseInt(parts[0], 10) || 0;
+      }
+
+      if (!proj.review.revisions) proj.review.revisions = [];
+      proj.review.revisions.push({
+        id: 'rev_' + Date.now(),
+        time: timeStr,
+        timeSec: sec,
+        note: note,
+        done: false
+      });
+
+      proj.review.revisions.sort((a, b) => a.timeSec - b.timeSec);
+
+      saveState();
+      closeModal('modalAddRevision');
+      renderVideoRevisions();
+      showToast(`Catatan revisi di [${timeStr}] berhasil disimpan!`, 'success');
+    }
+
+    function toggleRevisionDone(idx) {
+      const proj = state.projects[state.activeProjectId];
+      if (proj && proj.review && proj.review.revisions && proj.review.revisions[idx]) {
+        proj.review.revisions[idx].done = !proj.review.revisions[idx].done;
+        saveState();
+        renderVideoRevisions();
+      }
+    }
+
+    function deleteVideoRevision(idx) {
+      const proj = state.projects[state.activeProjectId];
+      if (proj && proj.review && proj.review.revisions) {
+        proj.review.revisions.splice(idx, 1);
+        saveState();
+        renderVideoRevisions();
+        showToast('Catatan revisi dihapus', 'info');
+      }
+    }
+
+    function seekVideoToTime(sec) {
+      const videoElem = document.getElementById('reviewVideoElement');
+      if (videoElem) {
+        videoElem.currentTime = sec;
+        videoElem.play().catch(() => {});
+        showToast(`Lompat ke detik ${sec}s di video player`, 'info');
+      }
+    }
+
+    // =========================================================================
+    // FLOATING QUICK-ACTION BAR (RESPONSIF SATU JEMPOL)
+    // =========================================================================
+    function updateFloatingBar() {
+      const indicator = document.getElementById('floatingStageIndicator');
+      const label = document.getElementById('floatingContextLabel');
+      const bar = document.getElementById('floatingQuickBar');
+      if (!indicator || !label || !bar) return;
+
+      const tabMap = {
+        'home': { step: 'Home', btn: 'Konten Baru' },
+        'riset': { step: '1. Riset & Aset', btn: 'Tambah Footage' },
+        'script': { step: '2. Susun Script', btn: 'Tambah Segmen' },
+        'rekaman': { step: '3. Rekaman Suara', btn: 'Take Audio' },
+        'review': { step: '4. Review Video', btn: 'Catat Revisi' },
+        'packaging': { step: '5. Thumbnail', btn: 'Edit Thumbnail' },
+        'output': { step: '6. Output Rilis', btn: 'Unduh Paket' }
+      };
+
+      const cur = tabMap[state.activeTab] || tabMap['home'];
+      indicator.innerText = cur.step;
+      label.innerText = cur.btn;
+    }
+
+    function triggerFloatingContextAction() {
+      switch (state.activeTab) {
+        case 'home':
+          openNewProjectModal();
+          break;
+        case 'riset':
+          openAddMediaModal();
+          break;
+        case 'script':
+          addScriptSegmentRow();
+          break;
+        case 'rekaman':
+          openAddAudioModal();
+          break;
+        case 'review':
+          openAddRevisionModal();
+          break;
+        case 'packaging':
+          openEditThumbnailModal();
+          break;
+        case 'output':
+          downloadAllOutputsPackage();
+          break;
+        default:
+          openNewProjectModal();
+      }
+    }
+
+    const STAGE_KEYS = ['home', 'riset', 'script', 'rekaman', 'review', 'packaging', 'output'];
+    function goToPrevStage() {
+      const idx = STAGE_KEYS.indexOf(state.activeTab);
+      if (idx > 0) {
+        openMenu(STAGE_KEYS[idx - 1]);
+      } else {
+        openMenu(STAGE_KEYS[STAGE_KEYS.length - 1]);
+      }
+    }
+    function goToNextStage() {
+      const idx = STAGE_KEYS.indexOf(state.activeTab);
+      if (idx < STAGE_KEYS.length - 1) {
+        openMenu(STAGE_KEYS[idx + 1]);
+      } else {
+        openMenu(STAGE_KEYS[0]);
+      }
+    }
+
+    // =========================================================================
+    // CLOUD SYNC (GOOGLE SHEETS, GOOGLE DRIVE & FIREBASE iaiflash0.0@gmail.com)
+    // =========================================================================
+    function switchCloudDbTab(tab) {
+      const btnGoogle = document.getElementById('tabBtnGoogle');
+      const btnFb = document.getElementById('tabBtnFirebase');
+      const panGoogle = document.getElementById('cloudPanelGoogle');
+      const panFb = document.getElementById('cloudPanelFirebase');
+
+      if (tab === 'google') {
+        if (btnGoogle) { btnGoogle.style.background = 'var(--primary)'; btnGoogle.style.color = '#fff'; }
+        if (btnFb) { btnFb.style.background = 'var(--bg-window)'; btnFb.style.color = 'var(--text-dark)'; }
+        if (panGoogle) panGoogle.style.display = 'block';
+        if (panFb) panFb.style.display = 'none';
+      } else {
+        if (btnGoogle) { btnGoogle.style.background = 'var(--bg-window)'; btnGoogle.style.color = 'var(--text-dark)'; }
+        if (btnFb) { btnFb.style.background = 'var(--primary)'; btnFb.style.color = '#fff'; }
+        if (panGoogle) panGoogle.style.display = 'none';
+        if (panFb) panFb.style.display = 'block';
+      }
+    }
+
+    function openCloudSyncModal() {
+      const savedGoogleUrl = localStorage.getItem('craftai_cloud_endpoint') || '';
+      const savedFbUrl = localStorage.getItem('craftai_firebase_url') || '';
+      const savedFbSec = localStorage.getItem('craftai_firebase_secret') || '';
+
+      const inputGoogle = document.getElementById('inputCloudScriptUrl');
+      if (inputGoogle) inputGoogle.value = savedGoogleUrl;
+
+      const inputFb = document.getElementById('inputFirebaseUrl');
+      if (inputFb) inputFb.value = savedFbUrl;
+
+      const inputFbSec = document.getElementById('inputFirebaseSecret');
+      if (inputFbSec) inputFbSec.value = savedFbSec;
+
+      const badgeGoogle = document.getElementById('cloudSyncStatusBadge');
+      if (badgeGoogle) {
+        badgeGoogle.innerText = savedGoogleUrl ? 'Terhubung (iaiflash0.0@gmail.com)' : 'Siap Terhubung';
+        badgeGoogle.className = savedGoogleUrl ? 'badge badge-mint' : 'badge badge-amber';
+      }
+
+      const badgeFb = document.getElementById('firebaseSyncStatusBadge');
+      if (badgeFb) {
+        badgeFb.innerText = savedFbUrl ? 'URL Tersimpan' : 'Siap Dihubungkan';
+        badgeFb.className = savedFbUrl ? 'badge badge-mint' : 'badge badge-amber';
+      }
+
+      openModal('modalCloudSync');
+    }
+
+    function copyAppsScriptCode() {
+      fetch('GoogleAppsScript_Bridge.gs')
+        .then(res => res.text())
+        .then(code => {
+          navigator.clipboard.writeText(code).then(() => {
+            showToast('Kode GoogleAppsScript_Bridge.gs berhasil disalin!', 'success');
+          });
+        })
+        .catch(() => {
+          showToast('Buka file GoogleAppsScript_Bridge.gs untuk menyalin kode.', 'info');
+        });
+    }
+
+    function saveCloudEndpointAndSync() {
+      const input = document.getElementById('inputCloudScriptUrl');
+      const url = input ? input.value.trim() : '';
+      if (!url) {
+        showToast('Masukkan URL Web App Google Apps Script Anda terlebih dahulu!', 'error');
+        return;
+      }
+      localStorage.setItem('craftai_cloud_endpoint', url);
+      showToast('Menyambungkan ke Google Sheets & Drive (iaiflash0.0@gmail.com)...', 'info');
+
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        mode: 'no-cors',
+        body: JSON.stringify({ action: 'syncDatabase', projects: state.projects, globalVault: state.globalVault })
+      })
+      .then(() => {
+        showToast('Sinkronisasi Sukses! Data tersimpan di Google Sheets & Drive iaiflash0.0@gmail.com', 'success');
+        const badge = document.getElementById('cloudSyncStatusBadge');
+        if (badge) {
+          badge.className = 'badge badge-mint';
+          badge.innerText = '✓ Terhubung: iaiflash0.0@gmail.com';
+        }
+        playNotificationSound();
+        closeModal('modalCloudSync');
+      })
+      .catch(() => {
+        showToast('Endpoint tersimpan di penyimpanan lokal!', 'info');
+        closeModal('modalCloudSync');
+      });
+    }
+
+    function syncWithFirebase() {
+      const urlInp = document.getElementById('inputFirebaseUrl');
+      const secInp = document.getElementById('inputFirebaseSecret');
+      let fbUrl = urlInp ? urlInp.value.trim() : '';
+      const secret = secInp ? secInp.value.trim() : '';
+
+      if (!fbUrl) {
+        showToast('Masukkan URL Firebase Realtime Database kamu!', 'error');
+        return;
+      }
+      if (fbUrl.endsWith('/')) fbUrl = fbUrl.slice(0, -1);
+      if (!fbUrl.startsWith('http')) fbUrl = 'https://' + fbUrl;
+
+      localStorage.setItem('craftai_firebase_url', fbUrl);
+      if (secret) localStorage.setItem('craftai_firebase_secret', secret);
+
+      const endpoint = `${fbUrl}/craftai_studio.json${secret ? `?auth=${secret}` : ''}`;
+      showToast('Menghubungkan ke Firebase Cloud...', 'info');
+
+      const payload = {
+        updatedAt: new Date().toISOString(),
+        account: 'iaiflash0.0@gmail.com',
+        projects: state.projects,
+        globalVault: state.globalVault
+      };
+
+      fetch(endpoint, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Firebase status: ' + res.status);
+        return res.json();
+      })
+      .then(data => {
+        showToast('Sukses! Data proyek tersimpan di Firebase Cloud.', 'success');
+        const badge = document.getElementById('firebaseSyncStatusBadge');
+        if (badge) {
+          badge.className = 'badge badge-mint';
+          badge.innerText = '✓ Terhubung: ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        }
+        playNotificationSound();
+        closeModal('modalCloudSync');
+      })
+      .catch(err => {
+        showToast('Gagal terhubung ke Firebase: ' + err.message, 'error');
+      });
+    }
+
+    function pullFromFirebase() {
+      const urlInp = document.getElementById('inputFirebaseUrl');
+      const secInp = document.getElementById('inputFirebaseSecret');
+      let fbUrl = urlInp ? urlInp.value.trim() : '';
+      const secret = secInp ? secInp.value.trim() : '';
+
+      if (!fbUrl) {
+        showToast('Masukkan URL Firebase Realtime Database kamu!', 'error');
+        return;
+      }
+      if (fbUrl.endsWith('/')) fbUrl = fbUrl.slice(0, -1);
+      if (!fbUrl.startsWith('http')) fbUrl = 'https://' + fbUrl;
+
+      const endpoint = `${fbUrl}/craftai_studio.json${secret ? `?auth=${secret}` : ''}`;
+      showToast('Mengambil data dari Firebase Cloud...', 'info');
+
+      fetch(endpoint)
+      .then(res => {
+        if (!res.ok) throw new Error('Firebase status: ' + res.status);
+        return res.json();
+      })
+      .then(data => {
+        if (data && data.projects) {
+          state.projects = data.projects;
+          if (data.globalVault) state.globalVault = data.globalVault;
+          saveState();
+          renderAllViews();
+          showToast('Data berhasil dimuat dari Firebase Cloud!', 'success');
+          playNotificationSound();
+          closeModal('modalCloudSync');
+        } else {
+          showToast('Firebase belum memiliki data proyek tersimpan.', 'info');
+        }
+      })
+      .catch(err => {
+        showToast('Gagal menarik data dari Firebase: ' + err.message, 'error');
+      });
+    }
+
+    // =========================================================================
+    // AUDIO NOTIFICATION CHIME SYNTHESIZER (WEB AUDIO API — NO EXTERNAL ASSET)
+    // =========================================================================
+    function playNotificationSound() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+
+        // Tone 1: F#5 (740 Hz)
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(740, now);
+        gain1.gain.setValueAtTime(0, now);
+        gain1.gain.linearRampToValueAtTime(0.18, now + 0.02);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.25);
+
+        // Tone 2: A#5 (932 Hz)
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(932, now + 0.12);
+        gain2.gain.setValueAtTime(0, now + 0.12);
+        gain2.gain.linearRampToValueAtTime(0.2, now + 0.14);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(now + 0.12);
+        osc2.stop(now + 0.45);
+      } catch (e) {
+        console.log('Audio chime info:', e);
+      }
+    }
+
+    // =========================================================================
+    // NOTIFICATION CENTER & CONTENT PRODUCTION REMINDERS
+    // =========================================================================
+    function updateNotificationPermissionUI() {
+      const badge = document.getElementById('notifPermissionBadge');
+      const btnReq = document.getElementById('btnReqNotifPerm');
+      if (!('Notification' in window)) {
+        if (badge) { badge.className = 'badge badge-gray'; badge.innerText = 'Tidak Didukung Browser'; }
+        if (btnReq) btnReq.style.display = 'none';
+        return;
+      }
+      if (Notification.permission === 'granted') {
+        if (badge) { badge.className = 'badge badge-mint'; badge.innerText = '✓ Diizinkan (Aktif)'; }
+        if (btnReq) {
+          btnReq.className = 'btn btn-white';
+          btnReq.innerText = '✓ Izin Sudah Aktif';
+          btnReq.disabled = true;
+        }
+      } else if (Notification.permission === 'denied') {
+        if (badge) { badge.className = 'badge badge-amber'; badge.innerText = 'Diblokir oleh Browser'; }
+        if (btnReq) btnReq.innerText = 'Ubah Izin di Pengaturan Browser';
+      } else {
+        if (badge) { badge.className = 'badge badge-primary'; badge.innerText = 'Belum Diminta'; }
+        if (btnReq) {
+          btnReq.className = 'btn btn-primary';
+          btnReq.innerText = 'Izinkan Notifikasi Desktop / HP';
+          btnReq.disabled = false;
+        }
+      }
+    }
+
+    function requestBrowserNotificationPermission() {
+      if (!('Notification' in window)) {
+        showToast('Browser ini tidak mendukung Web Notifications API', 'info');
+        return;
+      }
+      Notification.requestPermission().then(permission => {
+        updateNotificationPermissionUI();
+        if (permission === 'granted') {
+          showToast('Izin notifikasi berhasil diaktifkan!', 'success');
+          playNotificationSound();
+          triggerTestNotification();
+        } else {
+          showToast('Izin notifikasi tidak diberikan atau ditutup.', 'info');
+        }
+      });
+    }
+
+    function triggerTestNotification() {
+      playNotificationSound();
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try {
+          new Notification('CraftAI Studio — Content OS', {
+            body: '🔔 Notifikasi & Pengingat Konten Siap Rilis aktif! Siap tembus algoritma AI!',
+            icon: 'icon-192.png',
+            badge: 'icon-192.png'
+          });
+          showToast('Notifikasi sistem dikirim ke layar kamu!', 'success');
+        } catch (e) {
+          showToast('Notifikasi uji coba berhasil dibunyikan!', 'success');
+        }
+      } else {
+        showToast('Notifikasi suara berhasil dibunyikan! (Aktifkan izin untuk pop-up desktop)', 'info');
+      }
+    }
+
+    function openNotificationModal() {
+      updateNotificationPermissionUI();
+      renderNotificationList();
+      openModal('modalNotificationCenter');
+    }
+
+    function renderNotificationList() {
+      const container = document.getElementById('notifRemindersList');
+      const countEl = document.getElementById('notifPendingCount');
+      const dotEl = document.getElementById('notifBadgeDot');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const projects = Object.values(state.projects || {});
+      const reminders = [];
+
+      projects.forEach(p => {
+        const isReady = p.stage === 'Ready to Upload' || (p.review && p.review.uploadStatus && Object.values(p.review.uploadStatus).some(st => st === 'Siap Rilis'));
+        const isEditing = p.stage === 'Editing';
+        const isRecording = p.stage === 'Recording';
+
+        if (isReady) {
+          reminders.push({
+            id: p.id,
+            title: p.title,
+            badgeText: 'Siap Rilis',
+            badgeClass: 'badge-mint',
+            message: 'Video sudah siap! Segera rilis ke platform untuk mempertahankan konsistensi penonton.',
+            tabTarget: 'review'
+          });
+        } else if (isEditing) {
+          reminders.push({
+            id: p.id,
+            title: p.title,
+            badgeText: 'Tahap Edit',
+            badgeClass: 'badge-sky',
+            message: 'Tahap editing visual. Periksa transisi cut dan SFX retensi agar penonton tidak skip.',
+            tabTarget: 'review'
+          });
+        } else if (isRecording) {
+          reminders.push({
+            id: p.id,
+            title: p.title,
+            badgeText: 'Perlu Rekaman',
+            badgeClass: 'badge-amber',
+            message: 'Naskah sudah siap. Lakukan rekaman suara (voice-over) sekarang.',
+            tabTarget: 'rekaman'
+          });
+        }
+      });
+
+      if (countEl) countEl.innerText = `${reminders.length} Pengingat`;
+      if (dotEl) dotEl.style.display = reminders.length > 0 ? 'block' : 'none';
+
+      if (reminders.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:24px; color:var(--text-muted); background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px dashed var(--border-subtle);">
+            <div style="font-size:20px; margin-bottom:4px;">🎉</div>
+            <strong style="font-size:13px; color:var(--text-dark); display:block;">Semua Proyek Konten Berjalan Lancar!</strong>
+            <p style="font-size:11.5px; margin-top:3px;">Tidak ada antrean mendesak. Buat konten baru untuk menjaga pilar 40/40/20.</p>
+          </div>
+        `;
+        return;
+      }
+
+      reminders.forEach(rem => {
+        const card = document.createElement('div');
+        card.style.background = 'var(--bg-window)';
+        card.style.border = '1px solid var(--border-subtle)';
+        card.style.borderRadius = 'var(--radius-sm)';
+        card.style.padding = '10px 12px';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.gap = '4px';
+
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="font-size:13px; color:var(--text-dark);">${rem.title}</strong>
+            <span class="badge ${rem.badgeClass}" style="font-size:10px;">${rem.badgeText}</span>
+          </div>
+          <div style="font-size:11.5px; color:var(--text-body); line-height:1.4;">${rem.message}</div>
+          <div style="display:flex; justify-content:flex-end; margin-top:4px;">
+            <button class="btn btn-white" style="font-size:11px; padding:3px 8px;" onclick="goToProjectAndTab(${rem.id}, '${rem.tabTarget}')">
+              Buka Tahap ➔
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function goToProjectAndTab(projId, tabKey) {
+      selectProject(projId);
+      openMenu(tabKey);
+      closeModal('modalNotificationCenter');
+    }
+
+    function checkContentReminders() {
+      const projects = Object.values(state.projects || {});
+      const readyList = projects.filter(p => p.stage === 'Ready to Upload' || (p.review && p.review.uploadStatus && Object.values(p.review.uploadStatus).some(st => st === 'Siap Rilis')));
+      const dotEl = document.getElementById('notifBadgeDot');
+      if (dotEl) {
+        dotEl.style.display = readyList.length > 0 ? 'block' : 'none';
+      }
+    }
+
+    // =========================================================================
+    // CLIENT DATABASE LAYER (INDEXEDDB — UNLIMITED STORAGE & OFFLINE ENGINE)
+    // =========================================================================
+    let idbInstance = null;
+
+    function initDatabase() {
+      if (!window.indexedDB) {
+        console.log('IndexedDB tidak didukung oleh browser, menggunakan fallback LocalStorage.');
+        return;
+      }
+      try {
+        const req = window.indexedDB.open('CraftAI_Studio_DB', 2);
+        req.onupgradeneeded = function(e) {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains('projects')) {
+            db.createObjectStore('projects', { keyPath: 'id' });
+          }
+          if (!db.objectStoreNames.contains('meta')) {
+            db.createObjectStore('meta', { keyPath: 'key' });
+          }
+        };
+        req.onsuccess = function(e) {
+          idbInstance = e.target.result;
+          const badge = document.getElementById('indexedDbBadge');
+          if (badge) {
+            badge.className = 'badge badge-mint';
+            badge.innerText = '✓ IndexedDB Terhubung';
+          }
+          // Seed IndexedDB if needed
+          saveToIndexedDB();
+        };
+        req.onerror = function(e) {
+          console.warn('IndexedDB gagal dibuka:', e);
+        };
+      } catch (err) {
+        console.warn('Inisialisasi IndexedDB error:', err);
+      }
+    }
+
+    function saveToIndexedDB() {
+      if (!idbInstance) return;
+      try {
+        const tx = idbInstance.transaction(['projects', 'meta'], 'readwrite');
+        const projStore = tx.objectStore('projects');
+        const metaStore = tx.objectStore('meta');
+
+        Object.values(state.projects).forEach(p => {
+          projStore.put(p);
+        });
+
+        metaStore.put({ key: 'activeProjectId', value: state.activeProjectId });
+        metaStore.put({ key: 'globalVault', value: state.globalVault });
+        metaStore.put({ key: 'lastSyncedAt', value: new Date().toISOString() });
+      } catch (err) {
+        console.warn('Simpan ke IndexedDB gagal:', err);
+      }
+    }
+
+    function exportDatabaseJSON() {
+      const dump = {
+        app: 'CraftAI Studio',
+        version: '2.1.0',
+        user: 'iaiflash',
+        email: 'iaiflash0.0@gmail.com',
+        exportedAt: new Date().toISOString(),
+        activeProjectId: state.activeProjectId,
+        totalProjects: Object.keys(state.projects).length,
+        projects: state.projects,
+        globalVault: state.globalVault
+      };
+      const blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `CraftAI_Database_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('Database proyek & Vault berhasil diexport ke format JSON!', 'success');
+    }
+
+    function importDatabaseJSON(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (parsed && parsed.projects && Object.keys(parsed.projects).length > 0) {
+            state.projects = parsed.projects;
+            if (parsed.globalVault) {
+              state.globalVault = parsed.globalVault;
+            }
+            if (parsed.activeProjectId && state.projects[parsed.activeProjectId]) {
+              state.activeProjectId = parsed.activeProjectId;
+            } else {
+              state.activeProjectId = Object.keys(state.projects)[0];
+            }
+            saveState();
+            saveToIndexedDB();
+            renderAllViews();
+            showToast(`Database berhasil dipulihkan (${Object.keys(state.projects).length} Proyek)!`, 'success');
+            closeModal('modalCloudSync');
+          } else {
+            showToast('Format file JSON database tidak valid!', 'error');
+          }
+        } catch (err) {
+          showToast('Gagal membaca file JSON: ' + err.message, 'error');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    }
+
     function countWords(str) {
       if (!str) return 0;
       return str.trim().split(/\s+/).filter(Boolean).length;
@@ -5050,7 +7393,19 @@
 
     function initApp() {
       loadState();
+      initDatabase();
       renderAllViews();
+      checkContentReminders();
+      setInterval(checkContentReminders, 60000);
+
+      // Register PWA Service Worker for Offline Execution & Standalone APK Install
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('CraftAI Studio PWA Service Worker aktif:', reg.scope))
+            .catch(err => console.log('PWA Service Worker note:', err));
+        });
+      }
     }
 
     if (document.readyState === 'loading') {
